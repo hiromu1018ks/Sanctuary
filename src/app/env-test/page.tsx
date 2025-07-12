@@ -14,7 +14,7 @@ export default function EnvTestPage() {
   const testConnection = async () => {
     try {
       setConnectionStatus("テスト中...");
-      const { data, error } = await supabase.from("users").select("count");
+      const { error } = await supabase.from("users").select("count");
 
       if (error) {
         setConnectionStatus(`エラー：${error.message}`);
