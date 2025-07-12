@@ -1,8 +1,26 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 
@@ -69,7 +87,10 @@ export default function Home() {
               </div>
             </CardHeader>
             <CardContent>
-              <p>今日は素晴らしい一日でした！みなさんのおかげで新しいプロジェクトが成功しました。感謝の気持ちでいっぱいです 🙏</p>
+              <p>
+                今日は素晴らしい一日でした！みなさんのおかげで新しいプロジェクトが成功しました。感謝の気持ちでいっぱいです
+                🙏
+              </p>
             </CardContent>
           </Card>
 
@@ -86,7 +107,10 @@ export default function Home() {
               </div>
             </CardHeader>
             <CardContent>
-              <p>チームのみんなが応援してくれて、今日のプレゼンが大成功でした！みなさんの温かい言葉に励まされました ✨</p>
+              <p>
+                チームのみんなが応援してくれて、今日のプレゼンが大成功でした！みなさんの温かい言葉に励まされました
+                ✨
+              </p>
             </CardContent>
           </Card>
         </div>
