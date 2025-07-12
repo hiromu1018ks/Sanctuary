@@ -17,7 +17,7 @@ export async function GET() {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
-    const { data, error } = await supabase.from("users").select("count");
+    const { error } = await supabase.from("users").select("count");
     connectionTest = error ? `エラー: ${error.message}` : "接続成功";
   } catch (err) {
     connectionTest = `接続失敗: ${err}`;
