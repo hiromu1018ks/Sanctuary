@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { client } from "@/lib/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -14,7 +14,7 @@ export default function EnvTestPage() {
   const testConnection = async () => {
     try {
       setConnectionStatus("テスト中...");
-      const { error } = await supabase.from("users").select("count");
+      const { error } = await client.from("users").select("count");
 
       if (error) {
         setConnectionStatus(`エラー：${error.message}`);
