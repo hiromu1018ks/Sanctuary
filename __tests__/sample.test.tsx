@@ -1,6 +1,7 @@
 // Jest DOMの拡張マッチャーを有効化（toBeInDocumentなどのDOM専用アサーションを使用するため）
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
+import { it } from "node:test";
 
 // テスト専用のシンプルなコンポーネント
 // 実際のアプリケーションコンポーネントではなく、テストの動作確認のみを目的とする

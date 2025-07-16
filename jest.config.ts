@@ -17,8 +17,22 @@ const config: Config = {
 
   // Next.jsのパスエイリアス（@/）をJestでも解決できるようにマッピング
   moduleNameMapper: {
-    "^@/(.*)$": "<rootDir>/$1",
+    "^@/(.*)$": "<rootDir>/src/$1",
   },
+
+  // Supabaseクライアントライブラリをテスト環境でトランスパイル対象に含める
+  // これらのライブラリはESMモジュールのため、Jestでの実行にはトランスパイルが必要
+  transformIgnorePatterns: ["node_modules/(?!(isows|@supabase|@supabase/.*)/)"],
+
+  moduleFileExtensions: ["ts", "tsx", "js", "jsx"],
+
+  // TypeScriptファイルをES Modulesとして扱う設定
+  // モジュールのimport/exportを正しく処理するために必要
+  extensionsToTreatAsEsm: [".ts", ".tsx"],
+
+  // Next.jsのビルドファイルとnode_modulesをテスト対象から除外
+  // パフォーマンス向上と不要なテスト実行を防ぐため
+  testPathIgnorePatterns: ["<rootDir>/.next/", "<rootDir>/node_modules/"],
 };
 
 // Next.jsの設定とカスタム設定を統合した最終的なJest設定を出力
