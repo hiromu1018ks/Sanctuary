@@ -4,6 +4,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+const sanitizePostContent = (content: string): string => {
+  const SCRIPT_TAG_PATTERN =
+    /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
+
+  const HTML_TAG_PATTERN = /<[^>]*>/g;
+
+  return content.replace(SCRIPT_TAG_PATTERN, "").replace(HTML_TAG_PATTERN, "");
+};
+
 /**
  * 投稿フォームコンポーネント
  * 認証済みユーザーが新しい投稿を作成するためのフォーム
@@ -27,13 +36,15 @@ export const PostForm = () => {
       return;
     }
 
+    const sanitizedContent = sanitizePostContent(trimmedContent);
+
     setIsSubmitting(true);
     setMessage("");
 
     try {
       // TODO: 実際のAPI呼び出しに置き換える - 現在は開発用のシミュレート
       await new Promise(resolve => setTimeout(resolve, 2000));
-      console.log("送信された内容:", trimmedContent);
+      console.log("送信された内容:", sanitizedContent);
 
       setMessage("✅ 投稿が完了しました！");
       setPostContent(""); // 成功時のみフォームをリセット
