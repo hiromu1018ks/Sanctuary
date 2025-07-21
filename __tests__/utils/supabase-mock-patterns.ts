@@ -4,7 +4,7 @@ export interface MockUser {
   id: string;
   email: string;
   user_metadata: {
-    name: string;
+    full_name: string;
   };
 }
 
@@ -38,7 +38,7 @@ export const mockUser: MockUser = {
   id: "test-user-id",
   email: "test@example.com",
   user_metadata: {
-    name: "Test User",
+    full_name: "Test User",
   },
 };
 

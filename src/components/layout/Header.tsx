@@ -6,6 +6,15 @@ import { client } from "@/lib/supabase/client";
 export const Header = () => {
   const { user } = useAuth();
 
+  const handleGoogleSignIn = async () => {
+    await client.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: "http://localhost:3000/auth/callback",
+      },
+    });
+  };
+
   const handleLogout = async () => {
     await client.auth.signOut();
   };
@@ -22,7 +31,11 @@ export const Header = () => {
               <span className="hidden md:inline">こんにちは、</span>
               {user?.user_metadata.full_name || user?.email || "ゲスト"}さん
             </p>
-            <Button onClick={handleLogout}>ログアウト</Button>
+            {user ? (
+              <Button onClick={handleLogout}>ログアウト</Button>
+            ) : (
+              <Button onClick={handleGoogleSignIn}>ログイン</Button>
+            )}
           </div>
         </nav>
       </div>
