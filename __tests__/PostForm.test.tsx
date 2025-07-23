@@ -158,6 +158,7 @@ describe("PostForm", () => {
   });
 
   test("有効なテキストで送信ボタンをクリックすると、送信ボタンが「送信中...」になる", async () => {
+    // ユーザーが投稿ボタンを押した際、二重送信防止や進行中のフィードバックを正しく表示するためのテスト
     const mockUserAuth = useAuth as unknown as jest.Mock;
     mockUserAuth.mockReturnValue({
       user: {
@@ -167,6 +168,16 @@ describe("PostForm", () => {
       session: mockUser,
       loading: false,
     });
+
+    const mockFetch = jest
+      .fn()
+      .mockImplementation(
+        () =>
+          new Promise(resolve =>
+            setTimeout(() => resolve({ ok: true, status: 200 }), 100)
+          )
+      );
+    global.fetch = mockFetch;
 
     render(<PostForm />);
     const textArea = screen.getByRole("textbox");
@@ -189,6 +200,13 @@ describe("PostForm", () => {
   test("送信中にエラーが発生すると、エラーメッセージが表示される", async () => {
     // コンソール出力のモック - HTMLタグのサニタイゼーション処理を検証するため
     const consoleSpy = jest.spyOn(console, "log");
+
+    const mockFetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+    });
+    global.fetch = mockFetch;
+
     const mockUseAuth = useAuth as unknown as jest.Mock;
     mockUseAuth.mockReturnValue({
       user: { email: mockUser, user_metadata: mockUser.user_metadata },
@@ -205,7 +223,172 @@ describe("PostForm", () => {
 
     await screen.findByText("✅ 投稿が完了しました！", {}, { timeout: 3000 });
     // HTMLタグが除去されて安全な内容のみが送信されることを確認
-    expect(consoleSpy).toHaveBeenCalledWith("送信された内容:", "こんにちは");
+    expect(mockFetch).toHaveBeenCalledWith("/api/posts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        content: "こんにちは",
+      }),
+    });
     consoleSpy.mockRestore();
+    mockFetch.mockRestore();
+  });
+
+  test("サニタイズされたデータが/api/postsに正しく送信されること", async () => {
+    const mockFetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+    });
+    global.fetch = mockFetch;
+
+    const mockUseAuth = useAuth as unknown as jest.Mock;
+    mockUseAuth.mockReturnValue({
+      user: { email: mockUser.email, user_metadata: mockUser.user_metadata },
+      session: mockUser,
+      loading: false,
+    });
+
+    render(<PostForm />);
+
+    const textArea = screen.getByRole("textbox");
+    await userEvent.type(
+      textArea,
+      "<script>alert('test')</script>安全な投稿です"
+    );
+
+    const button = screen.getByRole("button");
+    await userEvent.click(button);
+
+    expect(mockFetch).toHaveBeenCalledWith("/api/posts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        content: "安全な投稿です",
+      }),
+    });
+
+    mockFetch.mockRestore();
+  });
+
+  test("API呼び出しが失敗した時に適切なエラーメッセージが表示されること", async () => {
+    const mockFetch = jest.fn().mockResolvedValue({
+      ok: false,
+      status: 500,
+    });
+    global.fetch = mockFetch;
+
+    const mockUseAuth = useAuth as unknown as jest.Mock;
+    mockUseAuth.mockReturnValue({
+      user: { email: mockUser.email, user_metadata: mockUser.user_metadata },
+      session: mockUser,
+      loading: false,
+    });
+
+    render(<PostForm />);
+
+    const textArea = screen.getByRole("textbox");
+    await userEvent.type(textArea, "テスト投稿内容です");
+
+    const button = screen.getByRole("button");
+    await userEvent.click(button);
+
+    const message = await screen.findByText(
+      "❌ 投稿に失敗しました",
+      {},
+      { timeout: 3000 }
+    );
+    console.log("表示されたメッセージ:", message.textContent);
+
+    await screen.findByText("❌ 投稿に失敗しました");
+  });
+
+  test("ネットワークタイムアウト時に適切にハンドリングされること", async () => {
+    const mockFetch = jest.fn().mockRejectedValue(new Error("Network Error"));
+    global.fetch = mockFetch;
+
+    const mockUseAuth = useAuth as unknown as jest.Mock;
+    mockUseAuth.mockReturnValue({
+      user: { email: mockUser.email, user_metadata: mockUser.user_metadata },
+      session: mockUser,
+      loading: false,
+    });
+
+    render(<PostForm />);
+
+    const textArea = screen.getByRole("textbox");
+    await userEvent.type(textArea, "ネットワークテスト投稿");
+
+    const button = screen.getByRole("button");
+    await userEvent.click(button);
+
+    await screen.findByText("❌ 投稿に失敗しました");
+
+    mockFetch.mockRestore();
+  });
+
+  test("API呼び出し成功後にフォームが正しくリセットされること", async () => {
+    const mockFetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+    });
+    global.fetch = mockFetch;
+
+    const mockUseAuth = useAuth as unknown as jest.Mock;
+    mockUseAuth.mockReturnValue({
+      user: { email: mockUser.email, user_metadata: mockUser.user_metadata },
+      session: mockUser,
+      loading: false,
+    });
+
+    render(<PostForm />);
+
+    const textArea = screen.getByRole("textbox");
+    await userEvent.type(textArea, "成功テストの投稿です");
+
+    expect(textArea).toHaveValue("成功テストの投稿です");
+
+    const button = screen.getByRole("button");
+    await userEvent.click(button);
+
+    await screen.findByText("✅ 投稿が完了しました！");
+
+    expect(textArea).toHaveValue("");
+
+    expect(button).toBeDisabled();
+
+    mockFetch.mockRestore();
+  });
+
+  test("予期しないエラーが発生してもアプリが崩壊しないこと", async () => {
+    const mockFetch = jest
+      .fn()
+      .mockRejectedValue(new TypeError("Cannot read property of undefined"));
+    global.fetch = mockFetch;
+
+    const mockUseAuth = useAuth as unknown as jest.Mock;
+    mockUseAuth.mockReturnValue({
+      user: { email: mockUser.email, user_metadata: mockUser.user_metadata },
+      session: mockUser,
+      loading: false,
+    });
+
+    render(<PostForm />);
+
+    const textArea = screen.getByRole("textbox");
+    await userEvent.type(textArea, "予期しないエラーテスト");
+
+    const button = screen.getByRole("button");
+    await userEvent.click(button);
+
+    await screen.findByText("❌ 投稿に失敗しました");
+
+    expect(textArea).toBeInTheDocument();
+    expect(button).toBeInTheDocument();
+
+    mockFetch.mockRestore();
   });
 });

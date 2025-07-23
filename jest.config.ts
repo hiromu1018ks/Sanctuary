@@ -10,7 +10,7 @@ const createJestConfig = nextJest({
 // プロジェクト固有のJest設定を定義
 const config: Config = {
   // テスト実行前にjest-domのマッチャーを読み込み、DOM要素のテストを可能にする
-  setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
 
   // React コンポーネントのテストでDOM操作を可能にするためjsdom環境を使用
   testEnvironment: "jsdom",

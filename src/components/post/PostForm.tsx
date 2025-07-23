@@ -26,6 +26,22 @@ export const PostForm = () => {
   // 投稿の適切な長さを保つための制限 - UXと性能のバランスを考慮
   const MAX_CHARS = 500;
 
+  const submitPost = async (content: string): Promise<void> => {
+    const response = await fetch("/api/posts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        content,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("API Error");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -42,9 +58,7 @@ export const PostForm = () => {
     setMessage("");
 
     try {
-      // TODO: 実際のAPI呼び出しに置き換える - 現在は開発用のシミュレート
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      console.log("送信された内容:", sanitizedContent);
+      await submitPost(sanitizedContent);
 
       setMessage("✅ 投稿が完了しました！");
       setPostContent(""); // 成功時のみフォームをリセット
