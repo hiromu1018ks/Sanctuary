@@ -1,5 +1,6 @@
 import type { Config } from "jest";
-import nextJest from "next/jest";
+
+const nextJest = require("next/jest");
 
 // Next.jsプロジェクト用のJest設定を自動生成するためのファクトリー関数を作成
 // Next.jsの内部的な設定（TypeScript、CSS modules、エイリアスなど）を自動的に処理

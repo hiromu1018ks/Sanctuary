@@ -2,46 +2,47 @@
  * @jest-environment node
  */
 
-const mockSupabaseClient = {
-  from: jest.fn(() => ({
-    insert: jest.fn().mockResolvedValue({ data: null, error: null }),
-  })),
-};
+import { config } from "dotenv";
+import { createClient } from "@supabase/supabase-js";
 
-// テスト環境でSupabaseの実際のデータベース接続を回避し、テストの独立性と実行速度を確保
-jest.mock("@/lib/supabase/server", () => ({
-  createClient: jest.fn(() => Promise.resolve(mockSupabaseClient)),
-}));
+config({ path: ".env.local" });
 
-import { POST } from "@/app/api/posts/route";
+describe("POST /api/posts", () => {
+  const TEST_USER_ID = "5d3d00e0-8044-4f43-baee-3dfb15fc349a";
 
-// Next.js App RouterのRequestオブジェクトを模擬する工場関数
-// 実際のHTTPリクエスト環境に依存せずにAPIハンドラーの動作を検証するため
-const createMockRequest = (data: any): Request =>
-  ({
-    json: jest.fn().mockResolvedValue(data),
-    method: "POST",
-  }) as unknown as Request;
+  let supabase: ReturnType<typeof createClient>;
 
-describe("/api/posts", () => {
-  test("有効なデータでPOSTリクエストが送信されると、200 OKステータスを返す", async () => {
-    // 最小限のテストデータを使用し、APIの基本的な正常系フローを検証
-    const postData = { content: "こんにちは" };
-
-    const request = createMockRequest(postData);
-    const response = await POST(request);
-
-    // APIが基本的な成功レスポンスを返すことを確認 - 詳細な機能実装前の基盤動作を保証
-    expect(response.status).toBe(200);
+  // 各テストの前にSupabaseクライアントを初期化
+  beforeEach(() => {
+    supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
   });
 
-  test("有効なデータでPOSTリクエストが送信されると、データがpostsテーブルに正常に挿入される", async () => {
-    const postData = { content: "テスト投稿" };
-    const request = createMockRequest(postData);
+  test("有効な投稿データがpostsテーブルに正常に保存されること", async () => {
+    // Arrange
+    const testContent = `This is a test post - ${Date.now()}`;
 
-    await POST(request);
+    // Act
+    const { error } = await supabase.from("posts").insert({
+      user_id: TEST_USER_ID,
+      content: testContent,
+    });
 
-    expect(mockSupabaseClient.from).toHaveBeenCalledWith("posts");
-    expect(mockSupabaseClient.from().insert).toHaveBeenCalledWith(postData);
+    // Assert
+    expect(error).toBeNull();
+
+    const { data: savedPosts } = await supabase
+      .from("posts")
+      .select("*")
+      .eq("user_id", TEST_USER_ID)
+      .eq("content", testContent);
+
+    expect(savedPosts).toHaveLength(1);
+    expect(savedPosts![0].content).toBe(testContent);
+
+    // Clean up
+    await supabase.from("posts").delete().eq("content", testContent);
   });
 });
