@@ -23,7 +23,9 @@ const config: Config = {
 
   // Supabaseクライアントライブラリをテスト環境でトランスパイル対象に含める
   // これらのライブラリはESMモジュールのため、Jestでの実行にはトランスパイルが必要
-  transformIgnorePatterns: ["node_modules/(?!(isows|@supabase|@supabase/.*)/)"],
+  transformIgnorePatterns: [
+    "node_modules/(?!(isows|@supabase|@supabase/.*|msw|msw/.*)/)",
+  ],
 
   moduleFileExtensions: ["ts", "tsx", "js", "jsx"],
 
