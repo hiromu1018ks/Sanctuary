@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: sanctuary-postgres
+    environment:
+      POSTGRES_DB: sanctuary
+      POSTGRES_USER: sanctuary_user
+      POSTGRES_PASSWORD: sanctuary_password
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d
+    networks:
+      - sanctuary-network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: sanctuary-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@sanctuary.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "8081:80"
+    depends_on:
+      - postgres
+    networks:
+      - sanctuary-network
+
+volumes:
+  postgres_data:
+
+networks:
+  sanctuary-network:
+    driver: bridge

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { User } from "@supabase/supabase-js";
 
@@ -68,20 +68,18 @@ const validatePostContent = (content: string): void => {
    * pending状態の投稿を即座にapproved
   に変更
    */
-const autoApproveMVP = async (
-  supabase: SupabaseClient,
-  userId: string,
-  contentTrimmed: string
-) => {
-  await supabase
-    .from("posts")
-    .update({
-      status: POST_STATUS.APPROVED,
-      approved_at: new Date().toISOString(),
-    })
-    .eq("user_id", userId)
-    .eq("content", contentTrimmed)
-    .eq("status", POST_STATUS.PENDING);
+const autoApproveMVP = async (supabase: SupabaseClient, postId: string) => {
+  console.log("Calling auto_approve_post with postId:", postId);
+
+  const { data, error } = await supabase.rpc("auto_approve_post", {
+    post_id_param: postId,
+  });
+
+  console.log("RPC result - data:", data, "error:", error);
+
+  if (error) {
+    throw error;
+  }
 };
 
 /**
@@ -94,34 +92,80 @@ const autoApproveMVP = async (
  */
 export async function POST(request: Request) {
   try {
-    // Supabaseクライアントを生成
-    const supabase = await createClient();
+    console.log("=== 投稿API開始 ===");
+
+    // Authorization ヘッダーからJWTトークンを取得
+    const authHeader = request.headers.get('authorization');
+    const token = authHeader?.replace('Bearer ', '');
+    
+    if (!token) {
+      return createErrorResponse("認証が必要です", 401);
+    }
+
+    // 通常のSupabaseクライアントを作成
+    const supabase = createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+
+    // JWTを手動で設定
+    await supabase.auth.setSession({
+      access_token: token,
+      refresh_token: ''
+    });
+
+    console.log("✅ Supabaseクライアント作成完了");
 
     // 認証済みユーザーを取得
     const user = await getAuthenticatedUser(supabase);
+    console.log("✅ 認証ユーザー取得完了:", user.id);
 
     // リクエストボディから投稿内容を取得
     const { content } = await request.json();
+    console.log("✅ リクエストボディ取得完了");
 
     // 投稿内容をバリデーション
     validatePostContent(content);
+    console.log("✅ バリデーション完了");
 
     const contentTrimmed = content.trim();
 
-    // postsテーブルに新規投稿を挿入
-    const { error } = await supabase.from("posts").insert({
-      user_id: user.id,
-      content: contentTrimmed,
-      status: POST_STATUS.PENDING,
-    });
+    console.log("=== INSERT開始 ===");
+    console.log("INSERT前の詳細情報:");
+    console.log("user.id:", user.id);
+    console.log("user.id type:", typeof user.id);
+    console.log("=== JWT確認 ===");
+    const { data: session } = await supabase.auth.getSession();
+    console.log(
+      "現在のsession:",
+      session.session?.access_token ? "存在" : "なし"
+    );
+    console.log("JWT user:", session.session?.user?.id);
 
-    // TODO: MVP期間中は、pending投稿が即座にapprovedに自動変更される
-    if (!error) {
-      await autoApproveMVP(supabase, user.id, contentTrimmed);
+    // auth.uid()をRPCで直接確認
+    const { data: authUid } = await supabase.rpc("auth.uid");
+    console.log("RPC auth.uid():", authUid);
+
+    // postsテーブルに新規投稿を挿入
+    const { data, error } = await supabase
+      .from("posts")
+      .insert({
+        user_id: user.id,
+        content: contentTrimmed,
+        status: POST_STATUS.PENDING,
+      })
+      .select();
+
+    console.log("INSERT結果 - data:", data, "error:", error);
+
+    if (!error && data?.[0]) {
+      console.log("=== 自動承認開始 ===");
+      await autoApproveMVP(supabase, data[0].post_id);
+      console.log("✅ 自動承認完了");
     }
 
     if (error) {
-      return createErrorResponse(error.message, 500);
+      console.error("Auto approval error:", error);
     }
 
     return new NextResponse(null, {
