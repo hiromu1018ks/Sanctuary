@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model posts {
+  post_id          String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id          String      @db.Uuid
+  content          String
+  template_type    String?     @db.VarChar(20)
+  status           String      @default("pending") @db.VarChar(20)
+  ai_review_passed Boolean?
+  review_reason    String?
+  approved_at      DateTime?   @db.Timestamp(6)
+  created_at       DateTime    @default(now()) @db.Timestamp(6)
+  updated_at       DateTime    @default(now()) @db.Timestamp(6)
+  users            users       @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
+  reactions        reactions[]
+
+  @@index([approved_at], map: "idx_posts_approved_at")
+  @@index([created_at], map: "idx_posts_created_at")
+  @@index([status], map: "idx_posts_status")
+  @@index([user_id], map: "idx_posts_user_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model reactions {
+  reaction_id   String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  post_id       String   @db.Uuid
+  user_id       String   @db.Uuid
+  reaction_type String   @db.VarChar(20)
+  created_at    DateTime @default(now()) @db.Timestamp(6)
+  posts         posts    @relation(fields: [post_id], references: [post_id], onDelete: Cascade, onUpdate: NoAction)
+  users         users    @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([post_id, user_id, reaction_type])
+  @@index([post_id], map: "idx_reactions_post_id")
+  @@index([reaction_type], map: "idx_reactions_reaction_type")
+  @@index([user_id], map: "idx_reactions_user_id")
+}
+
+model users {
+  user_id            String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  email              String      @unique @db.VarChar(255)
+  password_hash      String      @db.VarChar(255)
+  nickname           String      @db.VarChar(50)
+  self_introduction  String?
+  profile_image_url  String?     @db.VarChar(500)
+  gratitude_points   Int         @default(0)
+  current_tree_stage String      @default("seed") @db.VarChar(50)
+  status             String      @default("pending") @db.VarChar(20)
+  created_at         DateTime    @default(now()) @db.Timestamp(6)
+  updated_at         DateTime    @default(now()) @db.Timestamp(6)
+  posts              posts[]
+  reactions          reactions[]
+
+  @@index([created_at], map: "idx_users_created_at")
+  @@index([email], map: "idx_users_email")
+  @@index([gratitude_points], map: "idx_users_gratitude_points")
+  @@index([status], map: "idx_users_status")
+}

@@ -42,10 +42,11 @@ next-env.d.ts
 
 .claude
 .idea
-docs
 other
 CLAUDE.md
 /zettelkasten/
 /blog-drafts/
 /memo.txt
 playwright-report/index.html
+/docs/
+/sanctuary-api/.env*
