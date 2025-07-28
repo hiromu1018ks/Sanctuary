@@ -1,9 +1,16 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { PrismaClient } from "./generated/prisma";
+import { errorHandler } from "./middleware/errorHandler";
+import { loggerMiddleware } from "./middleware/logger";
+import { corsMiddleware } from "./middleware/cors";
 
 const app = new Hono();
 const prisma = new PrismaClient();
+
+app.use("*", errorHandler);
+app.use("*", loggerMiddleware);
+app.use("*", corsMiddleware);
 
 app.get("/", c => {
   return c.text("Hello Sanctuary API!");
