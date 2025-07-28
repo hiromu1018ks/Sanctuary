@@ -53,18 +53,22 @@ app.get("/", async c => {
   }
 });
 
+// 投稿を承認するエンドポイント
 app.put("/:id/approve", async c => {
   try {
     const id = c.req.param("id");
 
+    // 指定IDの投稿をデータベースから取得
     const existingPost = await prisma.posts.findUnique({
       where: { post_id: id },
     });
 
+    // 投稿が存在しない場合は404を返す
     if (!existingPost) {
       return c.json({ error: "Post not found" }, 404);
     }
 
+    // すでに承認済みの場合はエラーを返す
     if (existingPost.status === "approved") {
       return c.json(
         { error: "Post is already approved", post: existingPost },
@@ -72,6 +76,7 @@ app.put("/:id/approve", async c => {
       );
     }
 
+    // 投稿のstatusを"approved"に更新し、承認日時とAIレビュー通過フラグを設定
     const updatedPost = await prisma.posts.update({
       where: { post_id: id },
       data: {
@@ -85,7 +90,39 @@ app.put("/:id/approve", async c => {
       200
     );
   } catch (error) {
+    // 予期しないエラー発生時は500を返す
     console.error("Error approving post:", error);
     return c.json({ error: "Failed to approve post" }, 500);
   }
 });
+
+// 指定されたIDの投稿を削除するエンドポイント
+app.delete("/:id", async c => {
+  try {
+    const id = c.req.param("id");
+
+    // 指定IDの投稿が存在するか確認
+    const existingPost = await prisma.posts.findUnique({
+      where: { post_id: id },
+    });
+
+    // 投稿が存在しない場合は404エラーを返す
+    if (!existingPost) {
+      return c.json({ error: "Post not found" }, 404);
+    }
+
+    // 投稿をデータベースから削除
+    await prisma.posts.delete({
+      where: { post_id: id },
+    });
+
+    // 削除成功時のレスポンス
+    return c.json({ message: "Post deleted successfully" }, 200);
+  } catch (error) {
+    // 削除処理中にエラーが発生した場合のエラーハンドリング
+    console.error("Error deleting post:", error);
+    return c.json({ error: "Failed to delete post" }, 500);
+  }
+});
+
+export default app;
