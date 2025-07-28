@@ -5,6 +5,8 @@ import { errorHandler } from "./middleware/errorHandler";
 import { loggerMiddleware } from "./middleware/logger";
 import { corsMiddleware } from "./middleware/cors";
 
+import postRouter from "./routes/posts";
+
 const app = new Hono();
 const prisma = new PrismaClient();
 
@@ -32,6 +34,9 @@ app.get("/test-db", async c => {
     return c.json({ error: "Failed to connect to the database" }, 500);
   }
 });
+
+// 投稿API
+app.route("/api/posts", postRouter);
 
 const port = 3001;
 console.log(`Server is running on http://localhost:${port}`);
