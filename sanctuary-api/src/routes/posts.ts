@@ -14,15 +14,34 @@ app.post("/", async c => {
       return c.json({ error: "user_id and content are required" }, 400);
     }
 
+    const userProfile = await prisma.userProfile.findUnique({
+      where: { userId: body.user_id },
+    });
+
+    if (!userProfile) {
+      return c.json({ error: "UserProfile not found" }, 404);
+    }
+
     // postsテーブルに新しい投稿を作成
-    const post = await prisma.posts.create({
+    const post = await prisma.post.create({
       data: {
-        user_id: body.user_id,
+        userProfileId: userProfile.id,
         content: body.content,
       },
     });
 
-    return c.json(post, 201);
+    // 現時点では即座に承認
+    // TODO: AIレビューや承認フローを実装する
+    const approvedPost = await prisma.post.update({
+      where: { id: post.id },
+      data: {
+        status: "approved",
+        approvedAt: new Date(),
+        aiReviewPassed: true, // AIレビューが通過したと仮定
+      },
+    });
+
+    return c.json(approvedPost, 201);
   } catch (error) {
     // エラー発生時のログ出力とレスポンス
     console.error("Error creating post", error);
@@ -34,15 +53,19 @@ app.post("/", async c => {
 app.get("/", async c => {
   try {
     // postsテーブルからstatusがapprovedの投稿を新しい順に取得
-    const posts = await prisma.posts.findMany({
+    const posts = await prisma.post.findMany({
       where: {
         status: "approved",
       },
       orderBy: {
-        created_at: "desc",
+        createdAt: "desc",
       },
       include: {
-        users: true, // 投稿者情報も含めて取得
+        userProfile: {
+          include: {
+            user: true,
+          },
+        },
       },
     });
     return c.json(posts);
@@ -59,8 +82,8 @@ app.put("/:id/approve", async c => {
     const id = c.req.param("id");
 
     // 指定IDの投稿をデータベースから取得
-    const existingPost = await prisma.posts.findUnique({
-      where: { post_id: id },
+    const existingPost = await prisma.post.findUnique({
+      where: { id: id },
     });
 
     // 投稿が存在しない場合は404を返す
@@ -77,12 +100,12 @@ app.put("/:id/approve", async c => {
     }
 
     // 投稿のstatusを"approved"に更新し、承認日時とAIレビュー通過フラグを設定
-    const updatedPost = await prisma.posts.update({
-      where: { post_id: id },
+    const updatedPost = await prisma.post.update({
+      where: { id: id },
       data: {
         status: "approved",
-        approved_at: new Date(),
-        ai_review_passed: true, // AIレビューが通過したと仮定
+        approvedAt: new Date(),
+        aiReviewPassed: true, // AIレビューが通過したと仮定
       },
     });
     return c.json(
@@ -102,8 +125,8 @@ app.delete("/:id", async c => {
     const id = c.req.param("id");
 
     // 指定IDの投稿が存在するか確認
-    const existingPost = await prisma.posts.findUnique({
-      where: { post_id: id },
+    const existingPost = await prisma.post.findUnique({
+      where: { id: id },
     });
 
     // 投稿が存在しない場合は404エラーを返す
@@ -112,8 +135,8 @@ app.delete("/:id", async c => {
     }
 
     // 投稿をデータベースから削除
-    await prisma.posts.delete({
-      where: { post_id: id },
+    await prisma.post.delete({
+      where: { id: id },
     });
 
     // 削除成功時のレスポンス

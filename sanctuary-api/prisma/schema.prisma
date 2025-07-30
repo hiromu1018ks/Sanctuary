@@ -8,59 +8,124 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model posts {
-  post_id          String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  user_id          String      @db.Uuid
-  content          String
-  template_type    String?     @db.VarChar(20)
-  status           String      @default("pending") @db.VarChar(20)
-  ai_review_passed Boolean?
-  review_reason    String?
-  approved_at      DateTime?   @db.Timestamp(6)
-  created_at       DateTime    @default(now()) @db.Timestamp(6)
-  updated_at       DateTime    @default(now()) @db.Timestamp(6)
-  users            users       @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
-  reactions        reactions[]
+// Auth.js標準スキーマ
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-  @@index([approved_at], map: "idx_posts_approved_at")
-  @@index([created_at], map: "idx_posts_created_at")
-  @@index([status], map: "idx_posts_status")
-  @@index([user_id], map: "idx_posts_user_id")
+  // Auth.jsの必須リレーション
+  accounts Account[]
+  sessions Session[]
+
+  // Sanctuaryアプリとの連携
+  profile UserProfile?
+
+  @@map("User")
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
-model reactions {
-  reaction_id   String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  post_id       String   @db.Uuid
-  user_id       String   @db.Uuid
-  reaction_type String   @db.VarChar(20)
-  created_at    DateTime @default(now()) @db.Timestamp(6)
-  posts         posts    @relation(fields: [post_id], references: [post_id], onDelete: Cascade, onUpdate: NoAction)
-  users         users    @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
 
-  @@unique([post_id, user_id, reaction_type])
-  @@index([post_id], map: "idx_reactions_post_id")
-  @@index([reaction_type], map: "idx_reactions_reaction_type")
-  @@index([user_id], map: "idx_reactions_user_id")
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("Account")
 }
 
-model users {
-  user_id            String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  email              String      @unique @db.VarChar(255)
-  password_hash      String      @db.VarChar(255)
-  nickname           String      @db.VarChar(50)
-  self_introduction  String?
-  profile_image_url  String?     @db.VarChar(500)
-  gratitude_points   Int         @default(0)
-  current_tree_stage String      @default("seed") @db.VarChar(50)
-  status             String      @default("pending") @db.VarChar(20)
-  created_at         DateTime    @default(now()) @db.Timestamp(6)
-  updated_at         DateTime    @default(now()) @db.Timestamp(6)
-  posts              posts[]
-  reactions          reactions[]
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
 
-  @@index([created_at], map: "idx_users_created_at")
-  @@index([email], map: "idx_users_email")
-  @@index([gratitude_points], map: "idx_users_gratitude_points")
-  @@index([status], map: "idx_users_status")
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("Session")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("VerificationToken")
+}
+
+// Sanctuaryアプリ固有の情報
+model UserProfile {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  nickname         String   @db.VarChar(50)
+  selfIntroduction String?
+  profileImageUrl  String?  @db.VarChar(500)
+  gratitudePoints  Int      @default(0)
+  currentTreeStage String   @default("seed") @db.VarChar(50)
+  status           String   @default("pending") @db.VarChar(20)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // リレーション
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  posts     Post[]
+  reactions Reaction[]
+
+  @@index([gratitudePoints])
+  @@index([status])
+  @@map("UserProfile")
+}
+
+model Post {
+  id             String    @id @default(cuid())
+  userProfileId  String
+  content        String
+  templateType   String?   @db.VarChar(20)
+  status         String    @default("pending") @db.VarChar(20)
+  aiReviewPassed Boolean?
+  reviewReason   String?
+  approvedAt     DateTime? @db.Timestamp(6)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // リレーション
+  userProfile UserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+  reactions   Reaction[]
+
+  @@index([approvedAt])
+  @@index([createdAt])
+  @@index([status])
+  @@map("Post")
+}
+
+model Reaction {
+  id            String   @id @default(cuid())
+  postId        String
+  userProfileId String
+  reactionType  String   @db.VarChar(20)
+  createdAt     DateTime @default(now())
+
+  // リレーション
+  post        Post        @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userProfile UserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userProfileId, reactionType])
+  @@index([postId])
+  @@index([reactionType])
+  @@map("Reaction")
 }

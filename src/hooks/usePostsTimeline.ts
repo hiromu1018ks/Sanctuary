@@ -1,7 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { client as supabase } from "@/lib/supabase/client";
+
+interface HonoPostResponse {
+  id: string;
+  content: string;
+  createdAt: string;
+  userProfile: {
+    id: string;
+    displayName: string;
+    avatarUrl: string | null;
+    user: {
+      id: string;
+      name: string | null;
+      email: string | null;
+      image: string | null;
+    };
+  };
+}
 
 // 投稿データの型定義
 interface Post {
@@ -23,20 +39,6 @@ interface UsePostsTimelineReturn {
   refetch: () => Promise<void>;
 }
 
-// Supabaseから取得する投稿データの型定義
-interface SupabasePostResponse {
-  post_id: string;
-  content: string;
-  created_at: string;
-  users:
-    | {
-        user_id: string;
-        nickname: string;
-        profile_image_url: string | null;
-      }[]
-    | null;
-}
-
 // 投稿タイムライン取得用カスタムフック
 export const usePostsTimeline = (): UsePostsTimelineReturn => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -49,40 +51,29 @@ export const usePostsTimeline = (): UsePostsTimelineReturn => {
       setLoading(true);
       setError(null);
 
-      // Supabaseから投稿データを取得
-      const { data, error: supabaseError } = await supabase
-        .from("posts")
-        .select(
-          `post_id,
-           content,
-           created_at,
-           users!inner (
-            user_id,
-            nickname,
-            profile_image_url
-           )`
-        )
-        .eq("status", "approved")
-        .order("created_at", { ascending: false });
+      const response = await fetch("/api/posts");
 
-      if (supabaseError) {
-        throw supabaseError;
+      if (!response.ok) {
+        throw new Error(`HTTPエラー: ${response.status}`);
       }
 
-      if (data) {
-        // SupabaseのレスポンスをPost型に変換
-        const transformedPosts: Post[] = (data as SupabasePostResponse[]).map(
-          item => ({
-            post_id: item.post_id,
-            content: item.content,
-            created_at: item.created_at,
-            user: item.users?.[0] || null,
-          })
-        );
-        setPosts(transformedPosts);
-      } else {
-        setPosts([]);
-      }
+      const data: HonoPostResponse[] = await response.json();
+
+      const transformedPosts: Post[] = data.map(item => ({
+        post_id: item.id,
+        content: item.content,
+        created_at: item.createdAt,
+        user: {
+          user_id: item.userProfile.user.id,
+          nickname:
+            item.userProfile.displayName ||
+            item.userProfile.user.name ||
+            "匿名ユーザー",
+          profile_image_url:
+            item.userProfile.avatarUrl || item.userProfile.user.image,
+        },
+      }));
+      setPosts(transformedPosts);
     } catch (err) {
       setError("投稿の取得に失敗しました");
       console.error("Posts fetch error:", err);
