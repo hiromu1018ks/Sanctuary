@@ -4,6 +4,13 @@ import { PrismaClient } from "../generated/prisma";
 const app = new Hono();
 const prisma = new PrismaClient();
 
+interface PostWhereCondition {
+  status: string;
+  createdAt?: {
+    lt: Date;
+  };
+}
+
 // 新規投稿を作成するエンドポイント
 app.post("/", async c => {
   try {
@@ -52,14 +59,41 @@ app.post("/", async c => {
 // 承認済みの稿一覧を取得するエンドポイント
 app.get("/", async c => {
   try {
+    const limit = parseInt(c.req.query("limit") || "10", 10);
+    const offset = parseInt(c.req.query("offset") || "0", 10);
+    const cursor = c.req.query("cursor");
+
+    if (isNaN(limit) || isNaN(offset) || limit < 1 || offset < 0) {
+      return c.json({ error: "Invalid pagination parameters" }, 400);
+    }
+
+    const safeLimit = Math.min(limit, 50);
+
+    const whereCondition: PostWhereCondition = {
+      status: "approved",
+    };
+
+    if (cursor) {
+      try {
+        const cursorDate = new Date(cursor);
+        if (isNaN(cursorDate.getTime())) {
+          return c.json({ error: "Invalid cursor format" }, 400);
+        }
+        whereCondition.createdAt = {
+          lt: new Date(cursor),
+        };
+      } catch {
+        return c.json({ error: "Invalid cursor format" }, 400);
+      }
+    }
     // postsテーブルからstatusがapprovedの投稿を新しい順に取得
     const posts = await prisma.post.findMany({
-      where: {
-        status: "approved",
-      },
+      where: whereCondition,
       orderBy: {
         createdAt: "desc",
       },
+      take: safeLimit,
+      skip: cursor ? 0 : offset,
       include: {
         userProfile: {
           include: {
@@ -68,7 +102,20 @@ app.get("/", async c => {
         },
       },
     });
-    return c.json(posts);
+
+    const hasNextPage = posts.length === safeLimit;
+    const nextCursor =
+      posts.length > 0 ? posts[posts.length - 1].createdAt.toISOString() : null;
+    return c.json({
+      posts,
+      pagination: {
+        limit: safeLimit,
+        offset,
+        hasNextPage,
+        nextCursor,
+        totalReturned: posts.length,
+      },
+    });
   } catch (error) {
     // エラー発生時のログ出力とレスポンス
     console.error("Error fetching posts", error);
