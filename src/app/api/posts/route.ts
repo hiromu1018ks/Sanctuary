@@ -51,9 +51,15 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const response = await fetch(`${HONO_API_URL}`);
+    const url = new URL(request.url);
+    const queryParams = url.searchParams.toString();
+    const apiUrl = queryParams
+      ? `${HONO_API_URL}?${queryParams}`
+      : HONO_API_URL;
+
+    const response = await fetch(apiUrl);
 
     if (!response.ok) {
       return NextResponse.json(

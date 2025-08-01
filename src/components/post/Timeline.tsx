@@ -6,7 +6,17 @@ import { Notebook, Star } from "lucide-react";
 import { Button } from "../ui/button";
 
 export const Timeline = () => {
-  const { posts, loading, error, refetch } = usePostsTimeline();
+  const {
+    posts,
+    loading,
+    error,
+    refetch,
+    loadMore,
+    hasNextPage,
+    isPolling,
+    startPolling,
+    stopPolling,
+  } = usePostsTimeline();
 
   if (loading) {
     return (
@@ -50,6 +60,23 @@ export const Timeline = () => {
         {posts.map(post => (
           <PostCard key={post.post_id} post={post} />
         ))}
+      </div>
+      {hasNextPage && (
+        <div className="text-center mt-6">
+          <button onClick={loadMore}>もっと読み込む</button>
+        </div>
+      )}
+      <div className="flex gap-2 mt-4 p-4 border-t border-gray-200">
+        <Button
+          onClick={startPolling}
+          disabled={isPolling}
+          variant={isPolling ? "secondary" : "default"}
+        >
+          ボーリング開始 {isPolling && "🔄"}
+        </Button>
+        <Button onClick={stopPolling} variant="outline">
+          ボーリング停止
+        </Button>
       </div>
     </div>
   );
