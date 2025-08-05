@@ -26,7 +26,9 @@ export const PostForm = () => {
   // 投稿の適切な長さを保つための制限 - UXと性能のバランスを考慮
   const MAX_CHARS = 500;
 
-  const submitPost = async (content: string): Promise<void> => {
+  const submitPost = async (
+    content: string
+  ): Promise<{ success: boolean; message: string }> => {
     const response = await fetch("/api/posts", {
       method: "POST",
       headers: {
@@ -37,8 +39,22 @@ export const PostForm = () => {
       }),
     });
 
-    if (!response.ok) {
-      throw new Error("API Error");
+    const data = await response.json();
+
+    if (response.status === 201) {
+      // 承認された場合
+      return {
+        success: true,
+        message: data.message || "投稿が完了しました！",
+      };
+    } else if (response.status === 400) {
+      // AI審査で拒否された場合
+      return {
+        success: false,
+        message: data.message || "投稿が承認されませんでした",
+      };
+    } else {
+      throw new Error(data.error || "投稿に失敗しました");
     }
   };
 
@@ -58,10 +74,19 @@ export const PostForm = () => {
     setMessage("");
 
     try {
-      await submitPost(sanitizedContent);
+      const result = await submitPost(sanitizedContent);
 
-      setMessage("✅ 投稿が完了しました！");
-      setPostContent(""); // 成功時のみフォームをリセット
+      if (result.success) {
+        // 承認された場合のみフォームをクリア
+        setMessage("✅ " + result.message);
+        setPostContent(""); // 成功時のみフォームをリセット
+      } else {
+        // 拒否された場合:投稿内容を保持し、改善提案を表示
+        setMessage(
+          "💡 " + result.message + "\n\n投稿内容を編集して再度お試しください。"
+        );
+        // postContextはそのまま保持（リセットしない）
+      }
     } catch {
       setMessage("❌ 投稿に失敗しました");
     } finally {
@@ -119,7 +144,17 @@ export const PostForm = () => {
 
             {/* 投稿結果のフィードバック表示 */}
             {message && (
-              <div className="text-sm font-medium mt-2">{message}</div>
+              <div
+                className={`text-sm font-medium mt-2 p-3 rounded-md ${
+                  message.includes("✅")
+                    ? "bg-green-50 text-green-800 border border-green-200"
+                    : message.includes("💡")
+                      ? "bg-yellow-50 text-yellow-800 border border-yellow-200"
+                      : "bg-red-50 text-red-800 border border-red-200"
+                }`}
+              >
+                <div className="whitespace-pre-line">{message}</div>
+              </div>
             )}
           </form>
         </CardContent>

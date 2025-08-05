@@ -1,13 +1,16 @@
 import { Hono } from "hono";
 import { PrismaClient } from "../generated/prisma";
+import { AIReviewService } from "../services/aiReviewService";
 
 const app = new Hono();
 const prisma = new PrismaClient();
+const aiReviewService = new AIReviewService();
 
 interface PostWhereCondition {
   status: string;
   createdAt?: {
-    lt: Date;
+    lt?: Date;
+    gt?: Date;
   };
 }
 
@@ -29,6 +32,9 @@ app.post("/", async c => {
       return c.json({ error: "UserProfile not found" }, 404);
     }
 
+    console.log("AI審査開始:", body.content);
+    const aiResult = await aiReviewService.moderateContent(body.content);
+
     // postsテーブルに新しい投稿を作成
     const post = await prisma.post.create({
       data: {
@@ -37,18 +43,30 @@ app.post("/", async c => {
       },
     });
 
-    // 現時点では即座に承認
-    // TODO: AIレビューや承認フローを実装する
-    const approvedPost = await prisma.post.update({
+    const updatedPost = await prisma.post.update({
       where: { id: post.id },
       data: {
-        status: "approved",
-        approvedAt: new Date(),
-        aiReviewPassed: true, // AIレビューが通過したと仮定
+        status: aiResult.is_approved ? "approved" : "rejected",
+        approvedAt: aiResult.is_approved ? new Date() : null,
+        aiReviewPassed: aiResult.is_approved,
       },
     });
 
-    return c.json(approvedPost, 201);
+    return c.json(
+      {
+        post: updatedPost,
+        aiReview: {
+          approved: aiResult.is_approved,
+          confidence: aiResult.confidence_score,
+          reasons: aiResult.rejection_reasons,
+          userMessage: aiResult.userMessage,
+        },
+        message: aiResult.is_approved
+          ? "記事が投稿されました！"
+          : `投稿は承認されませんでした。${aiResult.userMessage?.join(" ")}`,
+      },
+      aiResult.is_approved ? 201 : 400
+    );
   } catch (error) {
     // エラー発生時のログ出力とレスポンス
     console.error("Error creating post", error);
@@ -62,6 +80,7 @@ app.get("/", async c => {
     const limit = parseInt(c.req.query("limit") || "10", 10);
     const offset = parseInt(c.req.query("offset") || "0", 10);
     const cursor = c.req.query("cursor");
+    const since = c.req.query("since");
 
     if (isNaN(limit) || isNaN(offset) || limit < 1 || offset < 0) {
       return c.json({ error: "Invalid pagination parameters" }, 400);
@@ -73,7 +92,19 @@ app.get("/", async c => {
       status: "approved",
     };
 
-    if (cursor) {
+    if (since) {
+      try {
+        const sinceDate = new Date(since);
+        if (isNaN(sinceDate.getTime())) {
+          return c.json({ error: "Invalid since format" }, 400);
+        }
+        whereCondition.createdAt = {
+          gt: sinceDate,
+        };
+      } catch {
+        return c.json({ error: "Invalid since format" }, 400);
+      }
+    } else if (cursor) {
       try {
         const cursorDate = new Date(cursor);
         if (isNaN(cursorDate.getTime())) {

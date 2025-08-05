@@ -175,7 +175,6 @@ export const usePostsTimeline = (): UsePostsTimelineReturn => {
       if (!response.ok) {
         throw new Error(`HTTPエラー: ${response.status}`);
       }
-
       const data: HonoPaginationResponse = await response.json();
 
       const transformedPosts: Post[] = data.posts.map(
