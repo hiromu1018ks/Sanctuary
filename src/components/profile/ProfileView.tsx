@@ -1,22 +1,12 @@
 "use client";
 
+import { ProfileData } from "@/types/profile";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 
 // プロフィール表示用コンポーネントのProps型定義
 interface ProfileViewProps {
-  profile: {
-    id: string;
-    nickname: string;
-    selfIntroduction: string | null;
-    profileImageUrl: string | null;
-    gratitudePoints: number;
-    currentTreeStage: string;
-    user: {
-      name: string | null;
-      image: string | null;
-    };
-  };
+  profile: ProfileData;
 }
 
 // プロフィール表示コンポーネント

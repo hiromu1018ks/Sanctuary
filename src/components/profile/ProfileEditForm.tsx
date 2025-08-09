@@ -3,14 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
+import { ProfileData } from "@/types/profile";
 
 // プロフィール編集フォームのProps型定義
 interface ProfileEditFormProps {
-  initialProfile: {
-    nickname: string;
-    selfIntroduction: string | null;
-    profileImageUrl: string | null;
-  };
+  initialProfile: ProfileData;
   onSaveSuccess: () => void;
 }
 
