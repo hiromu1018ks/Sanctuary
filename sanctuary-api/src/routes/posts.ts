@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { PrismaClient } from "../generated/prisma";
 import { AIReviewService } from "../services/aiReviewService";
 
+// HonoアプリケーションとDB/Aサービスの初期化
 const app = new Hono();
 const prisma = new PrismaClient();
 const aiReviewService = new AIReviewService();
@@ -24,6 +25,7 @@ app.post("/", async c => {
       return c.json({ error: "user_id and content are required" }, 400);
     }
 
+    // 投稿者のプロフィール取得
     const userProfile = await prisma.userProfile.findUnique({
       where: { userId: body.user_id },
     });
@@ -32,6 +34,7 @@ app.post("/", async c => {
       return c.json({ error: "UserProfile not found" }, 404);
     }
 
+    // 投稿内容をAIサービスで審査し、承認可否・理由などを取得
     console.log("AI審査開始:", body.content);
     const aiResult = await aiReviewService.moderateContent(body.content);
 
@@ -43,6 +46,7 @@ app.post("/", async c => {
       },
     });
 
+    // AI審査結果に基づき投稿ステータスを更新
     const updatedPost = await prisma.post.update({
       where: { id: post.id },
       data: {
@@ -77,6 +81,7 @@ app.post("/", async c => {
 // 承認済みの稿一覧を取得するエンドポイント
 app.get("/", async c => {
   try {
+    // ページネーション用パラメータ取得
     const limit = parseInt(c.req.query("limit") || "10", 10);
     const offset = parseInt(c.req.query("offset") || "0", 10);
     const cursor = c.req.query("cursor");
@@ -86,12 +91,15 @@ app.get("/", async c => {
       return c.json({ error: "Invalid pagination parameters" }, 400);
     }
 
+    // 取得件数の上限を設定
     const safeLimit = Math.min(limit, 50);
 
+    // 投稿取得条件: 承認済みかつ、指定日時以降/以前の投稿を絞り込む
     const whereCondition: PostWhereCondition = {
       status: "approved",
     };
 
+    // sinceパラメータが指定された場合はその日時以降の投稿を取得
     if (since) {
       try {
         const sinceDate = new Date(since);
@@ -105,6 +113,7 @@ app.get("/", async c => {
         return c.json({ error: "Invalid since format" }, 400);
       }
     } else if (cursor) {
+      // cursorパラメータが指定された場合はその日時以前の投稿を取得
       try {
         const cursorDate = new Date(cursor);
         if (isNaN(cursorDate.getTime())) {
@@ -134,6 +143,7 @@ app.get("/", async c => {
       },
     });
 
+    // 次ページ取得用のカーソル（最終投稿の作成日時）を設定
     const hasNextPage = posts.length === safeLimit;
     const nextCursor =
       posts.length > 0 ? posts[posts.length - 1].createdAt.toISOString() : null;
@@ -178,6 +188,7 @@ app.put("/:id/approve", async c => {
     }
 
     // 投稿のstatusを"approved"に更新し、承認日時とAIレビュー通過フラグを設定
+    // 管理者承認時はAIレビュー通過済みとみなす
     const updatedPost = await prisma.post.update({
       where: { id: id },
       data: {
