@@ -49,3 +49,6 @@ CLAUDE.md
 /memo.txt
 playwright-report/index.html
 /sanctuary-api/.env*
+
+# lsmcp cache
+.lsmcp/cache

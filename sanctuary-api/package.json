@@ -13,7 +13,8 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "hono": "^4.8.9"
+    "hono": "^4.8.9",
+    "typescript-language-server": "^4.4.0"
   },
   "devDependencies": {
     "@prisma/client": "^6.12.0",
@@ -21,6 +22,6 @@
     "nodemon": "^3.1.10",
     "prisma": "^6.12.0",
     "tsx": "^4.20.3",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.2"
   }
 }
