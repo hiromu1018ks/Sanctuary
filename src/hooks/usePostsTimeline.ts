@@ -9,7 +9,7 @@ interface HonoPostResponse {
   userProfile: {
     id: string;
     nickname: string;
-    avatarUrl: string | null;
+    profileImageUrl: string | null;
     user: {
       id: string;
       name: string | null;
@@ -100,7 +100,7 @@ export const usePostsTimeline = (): UsePostsTimelineReturn => {
             item.userProfile.user.name ||
             "匿名ユーザー",
           profile_image_url:
-            item.userProfile.avatarUrl || item.userProfile.user.image,
+            item.userProfile.profileImageUrl || item.userProfile.user.image,
         },
       }));
 
@@ -122,18 +122,11 @@ export const usePostsTimeline = (): UsePostsTimelineReturn => {
 
   // ボーリングを開始する関数
   const startPolling = useCallback(() => {
-    console.log(
-      "startPolling called,current pollingInterval:",
-      pollingInterval
-    );
-    console.log("current isPolling:", isPolling);
-
     if (pollingInterval) return; // 既にポーリング中の場合は何もしない
 
     const interval = setInterval(() => {
       pollForNewPosts();
     }, 30000);
-    console.log("Setting new interval:", interval);
     setPollingInterval(interval);
     setIsPolling(true);
   }, [pollingInterval, pollForNewPosts]);
@@ -189,7 +182,7 @@ export const usePostsTimeline = (): UsePostsTimelineReturn => {
               item.userProfile.user.name ||
               "匿名ユーザー",
             profile_image_url:
-              item.userProfile.avatarUrl || item.userProfile.user.image,
+              item.userProfile.profileImageUrl || item.userProfile.user.image,
           },
         })
       );
