@@ -5,6 +5,7 @@ export interface ProfileData {
   profileImageUrl: string | null;
   gratitudePoints: number;
   currentTreeStage: string;
+  status: string;
   user: {
     name: string | null;
     image: string | null;

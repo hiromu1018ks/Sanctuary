@@ -1,22 +1,34 @@
+import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import { useAuth } from "@/app/providers/AuthContext";
-import { Button } from "@/components/ui/button";
-import { client } from "@/lib/supabase/client";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import { Button } from "../ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { useEffect, useState } from "react";
 
 export const Header = () => {
-  const { user } = useAuth();
+  const { data: session } = useSession();
+  const [userNickname, setUserNickname] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      fetch("/api/profile/me")
+        .then(res => res.json())
+        .then(data => setUserNickname(data.profile?.nickname))
+        .catch(() => setUserNickname(null));
+    }
+  }, [session?.user?.id]);
 
   const handleGoogleSignIn = async () => {
-    await client.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: "http://localhost:3000/auth/callback",
-      },
-    });
+    await signIn("google");
   };
 
   const handleLogout = async () => {
-    await client.auth.signOut();
+    await signOut();
   };
 
   return (
@@ -27,12 +39,37 @@ export const Header = () => {
         </Link>
         <nav>
           <div className="flex items-center justify-end gap-4">
-            <p className="text-sm md:text-base">
-              <span className="hidden md:inline">こんにちは、</span>
-              {user?.user_metadata.full_name || user?.email || "ゲスト"}さん
-            </p>
-            {user ? (
-              <Button onClick={handleLogout}>ログアウト</Button>
+            {session?.user ? (
+              <>
+                <p className="text-sm md:text-base">
+                  <span className="hidden md:inline">こんにちは、</span>
+                  {userNickname || session.user.name || "ユーザー"}さん
+                </p>
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="p-0">
+                      <Avatar className="w-8 h-8">
+                        <AvatarImage
+                          src={session.user.image || ""}
+                          alt={session.user.name || "User"}
+                        />
+                        <AvatarFallback>
+                          {session.user.name?.charAt(0).toUpperCase() || "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem asChild>
+                      <Link href="/profile">プロフィール</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleLogout}>
+                      ログアウト
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
             ) : (
               <Button onClick={handleGoogleSignIn}>ログイン</Button>
             )}

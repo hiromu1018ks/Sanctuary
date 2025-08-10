@@ -14,6 +14,11 @@ export async function GET() {
   try {
     const session = await auth();
 
+    // デバッグ用ログ追加
+    console.log("=== Profile API Debug ===");
+    console.log("Session:", JSON.stringify(session, null, 2));
+    console.log("User ID:", session?.user?.id);
+    console.log("========================");
     // 未認証の場合はエラーを返す
     if (!session?.user?.id) {
       return createErrorResponse("認証が必要です", 401);

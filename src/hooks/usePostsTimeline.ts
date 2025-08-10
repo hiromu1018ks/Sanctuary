@@ -8,7 +8,7 @@ interface HonoPostResponse {
   createdAt: string;
   userProfile: {
     id: string;
-    displayName: string;
+    nickname: string;
     avatarUrl: string | null;
     user: {
       id: string;
@@ -96,7 +96,7 @@ export const usePostsTimeline = (): UsePostsTimelineReturn => {
         user: {
           user_id: item.userProfile.user.id,
           nickname:
-            item.userProfile.displayName ||
+            item.userProfile.nickname ||
             item.userProfile.user.name ||
             "匿名ユーザー",
           profile_image_url:
@@ -185,7 +185,7 @@ export const usePostsTimeline = (): UsePostsTimelineReturn => {
           user: {
             user_id: item.userProfile.user.id,
             nickname:
-              item.userProfile.displayName ||
+              item.userProfile.nickname ||
               item.userProfile.user.name ||
               "匿名ユーザー",
             profile_image_url:

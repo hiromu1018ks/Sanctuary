@@ -34,9 +34,11 @@ export default function ProfilePage() {
         const data = await response.json();
         setProfile(data.profile);
       } else {
+        await response.json();
         setError("プロフィールの取得に失敗しました");
       }
-    } catch {
+    } catch (error) {
+      console.error("Profile fetch error:", error);
       setError("ネットワークエラーが発生しました");
     } finally {
       setLoading(false);
