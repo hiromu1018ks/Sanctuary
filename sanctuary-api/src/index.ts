@@ -7,6 +7,7 @@ import { corsMiddleware } from "./middleware/cors";
 
 import postRouter from "./routes/posts";
 import profileRouter from "./routes/profile";
+import adminRouter from "./routes/admin";
 
 // Honoアプリケーションのインスタンスを作成
 const app = new Hono();
@@ -51,6 +52,9 @@ app.route("/api/posts", postRouter);
 
 // プロフィールAPIのルーティング
 app.route("/api/profile", profileRouter);
+
+// 管理者APIのルーティング
+app.route("/api/admin", adminRouter);
 
 // サーバー起動ポート番号
 const port = 3001;

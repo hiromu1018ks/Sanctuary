@@ -20,8 +20,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
   callbacks: {
     // セッションコールバックでユーザーIDをセッションに追加
-    session({ session, user }) {
+    async session({ session, user }) {
       session.user.id = user.id;
+      try {
+        const userProfile = await prisma.userProfile.findUnique({
+          where: { userId: user.id },
+          select: { role: true },
+        });
+
+        session.user.role = userProfile?.role || "user";
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+        session.user.role = "user";
+      }
       return session;
     },
   },

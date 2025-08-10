@@ -78,6 +78,7 @@ model UserProfile {
   gratitudePoints  Int      @default(0)
   currentTreeStage String   @default("seed") @db.VarChar(50)
   status           String   @default("pending") @db.VarChar(20)
+  role             String   @default("user") @db.VarChar(20)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
@@ -88,6 +89,7 @@ model UserProfile {
 
   @@index([gratitudePoints])
   @@index([status])
+  @@index([role])
   @@map("UserProfile")
 }
 
