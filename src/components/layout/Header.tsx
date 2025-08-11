@@ -31,7 +31,7 @@ export const Header = () => {
     await signOut();
   };
 
-  const displayName = userNickname || session?.user?.name || "ユーザー";
+  const displayName = userNickname || session?.user?.name || "User";
 
   return (
     <header role="banner" className="sticky top-0 z-50 w-full">

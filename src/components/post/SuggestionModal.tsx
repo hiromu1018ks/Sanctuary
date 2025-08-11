@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
+import { Lightbulb, Circle, Sparkles, Edit, CheckCircle, Info } from "lucide-react";
 
 interface SuggestionModalProps {
   isOpen: boolean;
@@ -35,7 +36,8 @@ export default function SuggestionModal({
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center text-orange-800">
-            💡 投稿内容の改善提案
+<Lightbulb className="inline w-5 h-5 mr-2" />
+            投稿内容の改善提案
           </DialogTitle>
           <DialogDescription className="text-gray-600">
             より前向きな表現での投稿をご提案します。お気に入りの表現に編集してからご投稿ください
@@ -46,7 +48,8 @@ export default function SuggestionModal({
           <Card className="border-red-200">
             <CardHeader>
               <CardTitle className="text-sm font-medium text-red-700">
-                🔴 元の投稿内容
+<Circle className="inline w-4 h-4 mr-2 text-red-600" />
+                元の投稿内容
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -61,7 +64,8 @@ export default function SuggestionModal({
           <Card className="border-green-200">
             <CardHeader>
               <CardTitle className="text-sm font-medium text-green-700">
-                ✨ 改善提案
+<Sparkles className="inline w-4 h-4 mr-2" />
+                改善提案
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -75,18 +79,20 @@ export default function SuggestionModal({
 
           <div className="flex flex-col sm:flex-row gap-3 justify-end pt-4 border-t">
             <Button variant="outline" onClick={onClose} className="sm:order-1">
-              ✏️ 自分で編集を続ける
+<Edit className="inline w-4 h-4 mr-2" />
+              自分で編集を続ける
             </Button>
             <Button
               onClick={handleAccept}
               className="bg-green-600 hover:bg-green-700 text-white sm:order-2"
             >
-              ✅ この提案を使う
+<CheckCircle className="inline w-4 h-4 mr-2" />
+              この提案を使う
             </Button>
           </div>
           <div className="text-sm text-gray-500 bg-blue-50 p-3 rounded-lg border border-blue-200">
             <div className="flex items-start gap-2">
-              <span className="text-blue-500 mt-0.5">ℹ️</span>
+              <Info className="w-4 h-4 text-blue-500 mt-0.5" />
               <div>
                 <p className="font-medium text-blue-800 mb-1">ご注意</p>
                 <p>

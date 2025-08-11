@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { Sparkles } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -97,7 +98,7 @@ export const PostForm = () => {
     if (trimmedContent.length === 0) {
       const errorMessage = "投稿内容を入力してください";
       setValidationError(errorMessage);
-      setMessage("❌ " + errorMessage);
+      setMessage("エラー: " + errorMessage);
       // アクセシビリティ: エラー時にフォーカスをテキストエリアに移動
       document.getElementById(textareaId)?.focus();
       return;
@@ -106,7 +107,7 @@ export const PostForm = () => {
     if (trimmedContent.length > MAX_CHARS) {
       const errorMessage = `投稿内容は${MAX_CHARS}文字以内で入力してください`;
       setValidationError(errorMessage);
-      setMessage("❌ " + errorMessage);
+      setMessage("エラー: " + errorMessage);
       document.getElementById(textareaId)?.focus();
       return;
     }
@@ -122,7 +123,7 @@ export const PostForm = () => {
 
       if (result.success) {
         // 承認された場合のみフォームをクリア
-        setMessage("✅ " + result.message);
+        setMessage("成功: " + result.message);
         setPostContent(""); // 成功時のみフォームをリセット
         // アクセシビリティ: 成功時にメッセージにフォーカス（スクリーンリーダー用）
         setTimeout(() => {
@@ -138,7 +139,7 @@ export const PostForm = () => {
           setMessage("");
         } else {
           setMessage(
-            "💡 " +
+            "提案: " +
               result.message +
               "\n\n投稿内容を編集して再度お試しください。"
           );
@@ -148,7 +149,7 @@ export const PostForm = () => {
         }
       }
     } catch {
-      setMessage("❌ 投稿に失敗しました");
+      setMessage("エラー: 投稿に失敗しました");
       setTimeout(() => {
         document.getElementById(textareaId)?.focus();
       }, 100);
@@ -177,7 +178,8 @@ export const PostForm = () => {
             className="flex items-center text-orange-800"
             id="form-title"
           >
-            ✨ 新しい投稿を作成
+<Sparkles className="w-5 h-5 mr-2 inline" />
+            新しい投稿を作成
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -201,7 +203,7 @@ export const PostForm = () => {
 
               <Textarea
                 id={textareaId}
-                placeholder="今日の感謝や応援したいことをシェアしよう 🌟"
+                placeholder="今日の感謝や応援したいことをシェアしよう"
                 value={postContent}
                 onChange={e => setPostContent(e.target.value)}
                 maxLength={MAX_CHARS}
@@ -252,7 +254,7 @@ export const PostForm = () => {
                     aria-live="assertive"
                   >
                     <span aria-hidden="true">
-                      ⚠ 上限まであと{MAX_CHARS - postContent.length}文字
+警告: 上限まであと{MAX_CHARS - postContent.length}文字
                     </span>
                     <span className="sr-only">
                       警告: 文字数制限まであと{MAX_CHARS - postContent.length}
@@ -281,22 +283,22 @@ export const PostForm = () => {
               <div
                 id={messageId}
                 className={`text-sm font-medium mt-2 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                  message.includes("✅")
+                  message.includes("成功:")
                     ? "bg-green-50 text-green-800 border border-green-200 focus:ring-green-500"
-                    : message.includes("💡")
+                    : message.includes("提案:")
                       ? "bg-yellow-50 text-yellow-800 border border-yellow-200 focus:ring-yellow-500"
                       : "bg-red-50 text-red-800 border border-red-200 focus:ring-red-500"
                 }`}
-                role={message.includes("❌") ? "alert" : "status"}
+                role={message.includes("エラー:") ? "alert" : "status"}
                 aria-live="polite"
                 tabIndex={-1}
               >
                 <div className="whitespace-pre-line">
                   {/* スクリーンリーダー用のプレフィックス */}
                   <span className="sr-only">
-                    {message.includes("✅")
+                    {message.includes("成功:")
                       ? "成功: "
-                      : message.includes("💡")
+                      : message.includes("提案:")
                         ? "情報: "
                         : "エラー: "}
                   </span>

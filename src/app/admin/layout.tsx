@@ -3,6 +3,7 @@
 import { withAdminAuth } from "@/hooks/useAdmin";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { BarChart3, FileText, Users } from "lucide-react";
 
 function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -25,7 +26,8 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
                       : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   } group flex items-center px-3 py-2 text-sm font-medium rounded-md`}
                 >
-                  📊 ダッシュボード
+<BarChart3 className="inline w-4 h-4 mr-2" />
+                  ダッシュボード
                 </Link>
                 <Link
                   href="/admin/users"
@@ -35,7 +37,8 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
                       : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   } group flex items-center px-3 py-2 text-sm font-medium rounded-md`}
                 >
-                  👥 ユーザー管理
+<Users className="inline w-4 h-4 mr-2" />
+                  ユーザー管理
                 </Link>
                 <Link
                   href="/admin/posts"
@@ -45,7 +48,8 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
                       : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   } group flex items-center px-3 py-2 text-sm font-medium rounded-md`}
                 >
-                  📝 投稿管理
+<FileText className="inline w-4 h-4 mr-2" />
+                  投稿管理
                 </Link>
               </div>
             </div>

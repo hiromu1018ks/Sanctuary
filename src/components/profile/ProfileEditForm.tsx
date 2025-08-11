@@ -39,14 +39,14 @@ export default function ProfileEditForm({
     const trimmedNickname = nickname.trim();
     // ニックネーム未入力チェック
     if (trimmedNickname.length === 0) {
-      setMessage("❌ ニックネームを入力してください");
+      setMessage("エラー: ニックネームを入力してください");
       return;
     }
 
     // ニックネーム文字数制限チェック
     if (trimmedNickname.length > MAX_NICKNAME_CHARS) {
       setMessage(
-        `❌ ニックネームは${MAX_NICKNAME_CHARS}文字以内で入力してください`
+        `エラー: ニックネームは${MAX_NICKNAME_CHARS}文字以内で入力してください`
       );
       return;
     }
@@ -71,15 +71,15 @@ export default function ProfileEditForm({
 
       // 更新成功時
       if (response.ok) {
-        setMessage("✅ プロフィールを更新しました！");
+        setMessage("成功: プロフィールを更新しました！");
         onSaveSuccess();
       } else {
         // 更新失敗時
-        setMessage(`❌ ${data.error || "更新に失敗しました"}`);
+        setMessage(`エラー: ${data.error || "更新に失敗しました"}`);
       }
     } catch {
       // ネットワークエラー時
-      setMessage("❌ ネットワークエラーが発生しました");
+      setMessage("エラー: ネットワークエラーが発生しました");
     } finally {
       setIsSubmitting(false);
     }
@@ -142,7 +142,7 @@ export default function ProfileEditForm({
           {message && (
             <div
               className={`text-sm font-medium mt-2 p-3 rounded-md ${
-                message.includes("✅")
+                message.includes("成功:")
                   ? "bg-green-50 text-green-800 border border-green-200"
                   : "bg-red-50 text-red-800 border border-red-200"
               }`}

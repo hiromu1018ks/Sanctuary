@@ -2,6 +2,7 @@
 
 import { useAdminDashboard } from "@/hooks/useAdminDashboard";
 import { Button } from "@/components/ui/button";
+import { RefreshCw, Lightbulb } from "lucide-react";
 
 export default function AdminDashboard() {
   const { stats, loading, error, refetch } = useAdminDashboard();
@@ -50,7 +51,8 @@ export default function AdminDashboard() {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold text-gray-900">ダッシュボード</h1>
         <Button onClick={refetch} variant="outline">
-          🔄 更新
+          <RefreshCw className="inline w-4 h-4 mr-2" />
+          更新
         </Button>
       </div>
 
@@ -110,7 +112,8 @@ export default function AdminDashboard() {
 
       <div className="mt-8">
         <p className="text-gray-600">
-          💡 ユーザー管理と投稿管理は左側のメニュー からアクセスできます。
+<Lightbulb className="inline w-4 h-4 mr-2" />
+          ユーザー管理と投稿管理は左側のメニュー からアクセスできます。
         </p>
       </div>
     </div>

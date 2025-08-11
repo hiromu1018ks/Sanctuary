@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { client } from "@/lib/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CheckCircle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function EnvTestPage() {
@@ -40,11 +41,19 @@ export default function EnvTestPage() {
           <CardContent className="space-y-2">
             <p>
               <strong>SUPABASE_URL:</strong>{" "}
-              {supabaseUrl ? "✅ 設定済み" : "❌ 未設定"}
+{supabaseUrl ? (
+                <span className="text-green-600"><CheckCircle className="w-4 h-4 inline mr-1" />設定済み</span>
+              ) : (
+                <span className="text-red-600"><X className="w-4 h-4 inline mr-1" />未設定</span>
+              )}
             </p>
             <p>
               <strong>SUPABASE_ANON_KEY:</strong>{" "}
-              {supabaseKey ? "✅ 設定済み" : "❌ 未設定"}
+{supabaseKey ? (
+                <span className="text-green-600"><CheckCircle className="w-4 h-4 inline mr-1" />設定済み</span>
+              ) : (
+                <span className="text-red-600"><X className="w-4 h-4 inline mr-1" />未設定</span>
+              )}
             </p>
           </CardContent>
         </Card>

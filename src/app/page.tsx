@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Timeline } from "@/components/post/Timeline";
 import { Header } from "@/components/layout/Header";
+import { LogIn, House } from "lucide-react";
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -14,10 +15,7 @@ export default function Home() {
   // 認証状態のローディング中
   if (status === "loading") {
     return (
-      <div
-        className="min-h-screen flex
-  items-center justify-center"
-      >
+      <div className="min-h-screen flex items-center justify-center">
         <Card className="shadow-lg">
           <CardContent className="text-center py-8">
             <p>読み込み中...</p>
@@ -33,8 +31,9 @@ export default function Home() {
       <div className="min-h-screen flex items-center justify-center">
         <Card className="shadow-lg max-w-md">
           <CardHeader>
-            <CardTitle className="text-center text-orange-800">
-              🏠 Sanctuary へようこそ
+            <CardTitle className="text-center text-orange-800 flex items-center justify-center">
+              <House className="w-5 h-5 mr-2" />
+              Sanctuary へようこそ
             </CardTitle>
           </CardHeader>
           <CardContent className="text-center space-y-4">
@@ -45,7 +44,8 @@ export default function Home() {
               onClick={() => signIn("google")}
               className="bg-blue-500 hover:bg-blue-600"
             >
-              🔐 Googleでログイン
+              <LogIn className="w-4 h-4 mr-2" />
+              Googleでログイン
             </Button>
           </CardContent>
         </Card>

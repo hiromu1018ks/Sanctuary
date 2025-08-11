@@ -1,6 +1,7 @@
 "use client";
 
 import { usePostManagement } from "@/hooks/usePostManagement";
+import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
@@ -153,7 +154,8 @@ export default function PostManagement() {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold text-gray-900">投稿管理</h1>
         <Button onClick={refetchPosts} variant="outline">
-          🔄 更新
+<RefreshCw className="w-4 h-4 mr-2" />
+          更新
         </Button>
       </div>
 

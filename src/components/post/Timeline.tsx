@@ -2,7 +2,7 @@
 
 import { usePostsTimeline } from "@/hooks/usePostsTimeline";
 import { PostCard } from "./PostCard";
-import { Notebook, Star } from "lucide-react";
+import { Notebook, Star, RefreshCw } from "lucide-react";
 import { Button } from "../ui/button";
 
 export const Timeline = () => {
@@ -133,7 +133,7 @@ export const Timeline = () => {
               {isPolling ? "自動更新中" : "自動更新を開始"}
             </span>
             {isPolling && (
-              <span aria-hidden="true" className="ml-1">🔄</span>
+              <RefreshCw className="w-4 h-4 ml-1" aria-hidden="true" />
             )}
           </Button>
           <Button 
