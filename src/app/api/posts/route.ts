@@ -33,18 +33,20 @@ export async function POST(request: Request) {
 
     console.log("Hono API呼び出し完了:", honoResponse.status);
 
-    if (!honoResponse.ok) {
-      const errorData = await honoResponse.json();
+    const postData = await honoResponse.json();
+    if (honoResponse.status === 201) {
+      console.log("投稿作成成功");
+      return NextResponse.json(postData, { status: 201 });
+    } else if (honoResponse.status === 400) {
+      console.log("AI審査で拒否、改善提案あり");
+      return NextResponse.json(postData, { status: 400 });
+    } else {
+      console.log("その他のエラー");
       return createErrorResponse(
-        errorData.error || "投稿の作成に失敗しました",
+        postData.error || "投稿の作成に失敗しました",
         honoResponse.status
       );
     }
-
-    const postData = await honoResponse.json();
-    console.log("投稿作成成功");
-
-    return NextResponse.json(postData, { status: 201 });
   } catch (error) {
     console.error("API Route エラー:", error);
     return createErrorResponse("サーバーエラーが発生しました", 500);

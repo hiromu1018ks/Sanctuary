@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import SuggestionModal from "./SuggestionModal";
 
 const sanitizePostContent = (content: string): string => {
   const SCRIPT_TAG_PATTERN =
@@ -24,19 +25,37 @@ export const PostForm = () => {
   const [message, setMessage] = useState<string>("");
   // アクセシビリティ: バリデーションエラー状態の管理
   const [validationError, setValidationError] = useState<string>("");
+  const [showSuggestionModal, setShowSuggestionModal] =
+    useState<boolean>(false);
+  const [suggestionData, setSuggestionData] = useState<{
+    original: string;
+    suggested: string;
+  }>({ original: "", suggested: "" });
 
   // 投稿の適切な長さを保つための制限 - UXと性能のバランスを考慮
   const MAX_CHARS = 500;
-  
+
   // アクセシビリティ: ユニークIDの生成
   const textareaId = "post-content-textarea";
   const charCountId = "char-count-status";
   const messageId = "form-message";
   const validationId = "validation-error";
 
+  const handleAcceptSuggestion = (content: string) => {
+    setPostContent(content);
+  };
+
+  const handleCloseModal = () => {
+    setShowSuggestionModal(false);
+  };
+
   const submitPost = async (
     content: string
-  ): Promise<{ success: boolean; message: string }> => {
+  ): Promise<{
+    success: boolean;
+    message: string;
+    suggested_content?: string;
+  }> => {
     const response = await fetch("/api/posts", {
       method: "POST",
       headers: {
@@ -60,6 +79,7 @@ export const PostForm = () => {
       return {
         success: false,
         message: data.message || "投稿が承認されませんでした",
+        suggested_content: data.aiReview?.suggested_content,
       };
     } else {
       throw new Error(data.error || "投稿に失敗しました");
@@ -109,15 +129,23 @@ export const PostForm = () => {
           document.getElementById(messageId)?.focus();
         }, 100);
       } else {
-        // 拒否された場合:投稿内容を保持し、改善提案を表示
-        setMessage(
-          "💡 " + result.message + "\n\n投稿内容を編集して再度お試しください。"
-        );
-        // postContextはそのまま保持（リセットしない）
-        // アクセシビリティ: エラー時にテキストエリアにフォーカス
-        setTimeout(() => {
-          document.getElementById(textareaId)?.focus();
-        }, 100);
+        if (result.suggested_content) {
+          setSuggestionData({
+            original: sanitizedContent,
+            suggested: result.suggested_content,
+          });
+          setShowSuggestionModal(true);
+          setMessage("");
+        } else {
+          setMessage(
+            "💡 " +
+              result.message +
+              "\n\n投稿内容を編集して再度お試しください。"
+          );
+          setTimeout(() => {
+            document.getElementById(textareaId)?.focus();
+          }, 100);
+        }
       }
     } catch {
       setMessage("❌ 投稿に失敗しました");
@@ -140,13 +168,12 @@ export const PostForm = () => {
 
   // アクセシビリティ: ARIA属性の計算
   const isOverLimit = postContent.length > MAX_CHARS;
-  const isNearLimit = postContent.length > 400;
-  
+
   return (
     <div className="container-responsive max-w-2xl">
       <Card className="shadow-lg">
         <CardHeader>
-          <CardTitle 
+          <CardTitle
             className="flex items-center text-orange-800"
             id="form-title"
           >
@@ -154,22 +181,24 @@ export const PostForm = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form 
-            onSubmit={handleSubmit} 
+          <form
+            onSubmit={handleSubmit}
             className="space-y-4"
             noValidate
             aria-labelledby="form-title"
             role="form"
           >
             <div className="space-y-2">
-              <label 
+              <label
                 htmlFor={textareaId}
                 className="block text-sm font-medium text-gray-700"
               >
                 投稿内容
-                <span className="text-red-500 ml-1" aria-label="必須項目">*</span>
+                <span className="text-red-500 ml-1" aria-label="必須項目">
+                  *
+                </span>
               </label>
-              
+
               <Textarea
                 id={textareaId}
                 placeholder="今日の感謝や応援したいことをシェアしよう 🌟"
@@ -187,7 +216,7 @@ export const PostForm = () => {
 
               {/* バリデーションエラーの表示 */}
               {validationError && (
-                <div 
+                <div
                   id={validationId}
                   className="text-sm text-red-600"
                   role="alert"
@@ -200,7 +229,7 @@ export const PostForm = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 sm:gap-0">
-              <div 
+              <div
                 id={charCountId}
                 className={`text-sm font-medium ${getCharCountColor()}`}
                 role="status"
@@ -211,17 +240,23 @@ export const PostForm = () => {
                   {postContent.length}/{MAX_CHARS}
                 </span>
                 <span className="sr-only">
-                  現在{postContent.length}文字入力されています。最大{MAX_CHARS}文字まで入力可能です。
+                  現在{postContent.length}文字入力されています。最大{MAX_CHARS}
+                  文字まで入力可能です。
                 </span>
-                
+
                 {/* 制限に近づいた際の追加警告 */}
                 {postContent.length > 450 && (
-                  <span className="ml-2 text-xs" role="alert" aria-live="assertive">
+                  <span
+                    className="ml-2 text-xs"
+                    role="alert"
+                    aria-live="assertive"
+                  >
                     <span aria-hidden="true">
                       ⚠ 上限まであと{MAX_CHARS - postContent.length}文字
                     </span>
                     <span className="sr-only">
-                      警告: 文字数制限まであと{MAX_CHARS - postContent.length}文字です
+                      警告: 文字数制限まであと{MAX_CHARS - postContent.length}
+                      文字です
                     </span>
                   </span>
                 )}
@@ -229,7 +264,9 @@ export const PostForm = () => {
 
               <Button
                 type="submit"
-                disabled={postContent.trim().length === 0 || isSubmitting || isOverLimit}
+                disabled={
+                  postContent.trim().length === 0 || isSubmitting || isOverLimit
+                }
                 className="bg-orange-500 hover:bg-orange-600"
                 isLoading={isSubmitting}
                 loadingText="投稿を送信中です"
@@ -257,12 +294,11 @@ export const PostForm = () => {
                 <div className="whitespace-pre-line">
                   {/* スクリーンリーダー用のプレフィックス */}
                   <span className="sr-only">
-                    {message.includes("✅") 
-                      ? "成功: " 
-                      : message.includes("💡") 
-                        ? "情報: " 
-                        : "エラー: "
-                    }
+                    {message.includes("✅")
+                      ? "成功: "
+                      : message.includes("💡")
+                        ? "情報: "
+                        : "エラー: "}
                   </span>
                   {message}
                 </div>
@@ -271,6 +307,14 @@ export const PostForm = () => {
           </form>
         </CardContent>
       </Card>
+      <SuggestionModal
+        isOpen={showSuggestionModal}
+        onClose={handleCloseModal}
+        originalContent={suggestionData.original}
+        suggestedContent={suggestionData.suggested}
+        onAcceptSuggestion={handleAcceptSuggestion}
+      />
     </div>
   );
-}
+};
+

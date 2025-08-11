@@ -13,6 +13,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "hono": "^4.8.9",
     "typescript-language-server": "^4.4.0"
   },

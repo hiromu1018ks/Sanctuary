@@ -1,11 +1,11 @@
 import { Hono } from "hono";
 import { PrismaClient } from "../generated/prisma";
-import { AIReviewService } from "../services/aiReviewService";
+import { GeminiAIReviewService } from "../services/geminiAIReviewService";
 
 // HonoアプリケーションとDB/Aサービスの初期化
 const app = new Hono();
 const prisma = new PrismaClient();
-const aiReviewService = new AIReviewService();
+const aiReviewService = new GeminiAIReviewService();
 
 interface PostWhereCondition {
   status: string;
@@ -64,6 +64,7 @@ app.post("/", async c => {
           confidence: aiResult.confidence_score,
           reasons: aiResult.rejection_reasons,
           userMessage: aiResult.userMessage,
+          suggested_content: aiResult.suggested_content,
         },
         message: aiResult.is_approved
           ? "記事が投稿されました！"
