@@ -40,19 +40,93 @@ function Button({
   variant,
   size,
   asChild = false,
+  isLoading = false,
+  loadingText = "読み込み中...",
+  iconBefore,
+  iconAfter,
+  children,
+  disabled,
+  type = "button",
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean;
+    isLoading?: boolean;
+    loadingText?: string;
+    iconBefore?: React.ReactNode;
+    iconAfter?: React.ReactNode;
   }) {
   const Comp = asChild ? Slot : "button";
+  
+  // アクセシビリティのための状態管理
+  const isDisabled = disabled || isLoading;
+  
+  // ARIA属性の動的生成
+  const ariaProps = {
+    'aria-disabled': isDisabled ? 'true' : undefined,
+    'aria-busy': isLoading ? 'true' : undefined,
+    'data-loading': isLoading ? 'true' : undefined,
+    role: asChild ? undefined : 'button',
+    tabIndex: isDisabled ? -1 : 0,
+    type: asChild ? undefined : type,
+  };
 
   return (
     <Comp
       data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(
+        buttonVariants({ variant, size, className }),
+        isLoading && "cursor-wait",
+        isDisabled && "pointer-events-none"
+      )}
+      disabled={isDisabled}
+      {...ariaProps}
       {...props}
-    />
+    >
+      {isLoading ? (
+        <>
+          {/* Loading スピナー（アクセシブル） */}
+          <svg
+            className="animate-spin mr-2 h-4 w-4"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            />
+          </svg>
+          {/* スクリーンリーダー用テキスト */}
+          <span className="sr-only">{loadingText}</span>
+          {children}
+        </>
+      ) : (
+        <>
+          {iconBefore && (
+            <span className="flex-shrink-0" aria-hidden="true">
+              {iconBefore}
+            </span>
+          )}
+          {children}
+          {iconAfter && (
+            <span className="flex-shrink-0" aria-hidden="true">
+              {iconAfter}
+            </span>
+          )}
+        </>
+      )}
+    </Comp>
   );
 }
 

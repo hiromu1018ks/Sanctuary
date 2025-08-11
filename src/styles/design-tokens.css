@@ -1,0 +1,287 @@
+/**
+ * Sanctuary Design Tokens
+ * Based on Atlassian Design System principles
+ * Using OKLCH color space for better perceptual uniformity
+ */
+
+:root {
+  /* ================================
+   * SANCTUARY BRAND COLORS (Orange-based)
+   * ================================ */
+  
+  /* Primary Brand Colors - Sanctuary Orange Palette */
+  --color-brand-50: oklch(0.975 0.015 70);     /* #fef7f0 - 最も薄いオレンジ */
+  --color-brand-100: oklch(0.95 0.03 70);      /* #fdedd5 - 薄いオレンジ */
+  --color-brand-200: oklch(0.9 0.06 70);       /* #fbd7aa - 軽いオレンジ */
+  --color-brand-300: oklch(0.84 0.09 70);      /* #f7c074 - 中間の軽いオレンジ */
+  --color-brand-400: oklch(0.77 0.12 70);      /* #fb923c - 明るいオレンジ */
+  --color-brand-500: oklch(0.71 0.15 70);      /* #f97316 - メインブランドカラー */
+  --color-brand-600: oklch(0.63 0.15 70);      /* #ea580c - 少し濃いオレンジ */
+  --color-brand-700: oklch(0.54 0.13 70);      /* #c2410c - 濃いオレンジ */
+  --color-brand-800: oklch(0.44 0.11 70);      /* #9a3412 - とても濃いオレンジ */
+  --color-brand-900: oklch(0.37 0.09 70);      /* #7c2d12 - 最も濃いオレンジ */
+
+  /* ================================
+   * SEMANTIC COLORS
+   * ================================ */
+  
+  /* Success Colors - Green Palette */
+  --color-success-50: oklch(0.97 0.02 150);    /* #ecfdf5 */
+  --color-success-100: oklch(0.94 0.04 150);   /* #d1fae5 */
+  --color-success-200: oklch(0.88 0.08 150);   /* #a7f3d0 */
+  --color-success-300: oklch(0.79 0.12 150);   /* #6ee7b7 */
+  --color-success-400: oklch(0.68 0.16 150);   /* #34d399 */
+  --color-success-500: oklch(0.57 0.16 150);   /* #10b981 - メイン成功カラー */
+  --color-success-600: oklch(0.48 0.14 150);   /* #059669 */
+  --color-success-700: oklch(0.39 0.12 150);   /* #047857 */
+  --color-success-800: oklch(0.31 0.10 150);   /* #065f46 */
+  --color-success-900: oklch(0.25 0.08 150);   /* #064e3b */
+
+  /* Warning Colors - Amber Palette */
+  --color-warning-50: oklch(0.98 0.01 85);     /* #fffbeb */
+  --color-warning-100: oklch(0.95 0.03 85);    /* #fef3c7 */
+  --color-warning-200: oklch(0.90 0.06 85);    /* #fde68a */
+  --color-warning-300: oklch(0.84 0.09 85);    /* #fcd34d */
+  --color-warning-400: oklch(0.77 0.12 85);    /* #fbbf24 */
+  --color-warning-500: oklch(0.70 0.13 85);    /* #f59e0b - メイン警告カラー */
+  --color-warning-600: oklch(0.62 0.13 85);    /* #d97706 */
+  --color-warning-700: oklch(0.53 0.11 85);    /* #b45309 */
+  --color-warning-800: oklch(0.43 0.09 85);    /* #92400e */
+  --color-warning-900: oklch(0.35 0.07 85);    /* #78350f */
+
+  /* Danger Colors - Red Palette */
+  --color-danger-50: oklch(0.97 0.02 25);      /* #fef2f2 */
+  --color-danger-100: oklch(0.94 0.04 25);     /* #fee2e2 */
+  --color-danger-200: oklch(0.88 0.08 25);     /* #fecaca */
+  --color-danger-300: oklch(0.79 0.12 25);     /* #fca5a5 */
+  --color-danger-400: oklch(0.68 0.16 25);     /* #f87171 */
+  --color-danger-500: oklch(0.57 0.18 25);     /* #ef4444 - メイン危険カラー */
+  --color-danger-600: oklch(0.49 0.17 25);     /* #dc2626 */
+  --color-danger-700: oklch(0.41 0.15 25);     /* #b91c1c */
+  --color-danger-800: oklch(0.33 0.12 25);     /* #991b1b */
+  --color-danger-900: oklch(0.27 0.10 25);     /* #7f1d1d */
+
+  /* Info Colors - Blue Palette */
+  --color-info-50: oklch(0.97 0.02 230);       /* #eff6ff */
+  --color-info-100: oklch(0.94 0.04 230);      /* #dbeafe */
+  --color-info-200: oklch(0.88 0.08 230);      /* #bfdbfe */
+  --color-info-300: oklch(0.79 0.12 230);      /* #93c5fd */
+  --color-info-400: oklch(0.68 0.16 230);      /* #60a5fa */
+  --color-info-500: oklch(0.57 0.18 230);      /* #3b82f6 - メイン情報カラー */
+  --color-info-600: oklch(0.49 0.17 230);      /* #2563eb */
+  --color-info-700: oklch(0.41 0.15 230);      /* #1d4ed8 */
+  --color-info-800: oklch(0.33 0.12 230);      /* #1e40af */
+  --color-info-900: oklch(0.27 0.10 230);      /* #1e3a8a */
+
+  /* ================================
+   * NEUTRAL COLORS (Gray Scale)
+   * ================================ */
+  
+  --color-neutral-0: oklch(1 0 0);              /* #ffffff - 純白 */
+  --color-neutral-50: oklch(0.98 0.002 270);    /* #f9fafb */
+  --color-neutral-100: oklch(0.96 0.004 270);   /* #f3f4f6 */
+  --color-neutral-200: oklch(0.92 0.006 270);   /* #e5e7eb */
+  --color-neutral-300: oklch(0.85 0.008 270);   /* #d1d5db */
+  --color-neutral-400: oklch(0.68 0.012 270);   /* #9ca3af */
+  --color-neutral-500: oklch(0.57 0.015 270);   /* #6b7280 */
+  --color-neutral-600: oklch(0.47 0.018 270);   /* #4b5563 */
+  --color-neutral-700: oklch(0.38 0.020 270);   /* #374151 */
+  --color-neutral-800: oklch(0.28 0.022 270);   /* #1f2937 */
+  --color-neutral-900: oklch(0.19 0.024 270);   /* #111827 */
+  --color-neutral-950: oklch(0.11 0.026 270);   /* #030712 - 最も濃いグレー */
+
+  /* ================================
+   * TYPOGRAPHY SCALE
+   * ================================ */
+  
+  /* Font Sizes (Atlassian Typography Scale) */
+  --font-size-xs: 0.75rem;      /* 12px */
+  --font-size-sm: 0.875rem;     /* 14px */
+  --font-size-base: 1rem;       /* 16px - Base */
+  --font-size-lg: 1.125rem;     /* 18px */
+  --font-size-xl: 1.25rem;      /* 20px */
+  --font-size-2xl: 1.5rem;      /* 24px */
+  --font-size-3xl: 1.875rem;    /* 30px */
+  --font-size-4xl: 2.25rem;     /* 36px */
+  --font-size-5xl: 3rem;        /* 48px */
+  --font-size-6xl: 3.75rem;     /* 60px */
+
+  /* Line Heights */
+  --line-height-none: 1;
+  --line-height-tight: 1.25;
+  --line-height-snug: 1.375;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+  --line-height-loose: 2;
+
+  /* Font Weights */
+  --font-weight-thin: 100;
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  --font-weight-black: 900;
+
+  /* ================================
+   * SPACING SCALE (8pt Grid System)
+   * ================================ */
+  
+  --space-0: 0;
+  --space-px: 1px;
+  --space-0-5: 0.125rem;    /* 2px */
+  --space-1: 0.25rem;       /* 4px */
+  --space-1-5: 0.375rem;    /* 6px */
+  --space-2: 0.5rem;        /* 8px - Base unit */
+  --space-2-5: 0.625rem;    /* 10px */
+  --space-3: 0.75rem;       /* 12px */
+  --space-3-5: 0.875rem;    /* 14px */
+  --space-4: 1rem;          /* 16px */
+  --space-5: 1.25rem;       /* 20px */
+  --space-6: 1.5rem;        /* 24px */
+  --space-7: 1.75rem;       /* 28px */
+  --space-8: 2rem;          /* 32px */
+  --space-9: 2.25rem;       /* 36px */
+  --space-10: 2.5rem;       /* 40px */
+  --space-11: 2.75rem;      /* 44px */
+  --space-12: 3rem;         /* 48px */
+  --space-14: 3.5rem;       /* 56px */
+  --space-16: 4rem;         /* 64px */
+  --space-20: 5rem;         /* 80px */
+  --space-24: 6rem;         /* 96px */
+  --space-28: 7rem;         /* 112px */
+  --space-32: 8rem;         /* 128px */
+  --space-36: 9rem;         /* 144px */
+  --space-40: 10rem;        /* 160px */
+  --space-44: 11rem;        /* 176px */
+  --space-48: 12rem;        /* 192px */
+  --space-52: 13rem;        /* 208px */
+  --space-56: 14rem;        /* 224px */
+  --space-60: 15rem;        /* 240px */
+  --space-64: 16rem;        /* 256px */
+  --space-72: 18rem;        /* 288px */
+  --space-80: 20rem;        /* 320px */
+  --space-96: 24rem;        /* 384px */
+
+  /* ================================
+   * BORDER RADIUS SCALE
+   * ================================ */
+  
+  --radius-none: 0;
+  --radius-sm: 0.125rem;     /* 2px */
+  --radius-base: 0.25rem;    /* 4px */
+  --radius-md: 0.375rem;     /* 6px */
+  --radius-lg: 0.5rem;       /* 8px */
+  --radius-xl: 0.75rem;      /* 12px */
+  --radius-2xl: 1rem;        /* 16px */
+  --radius-3xl: 1.5rem;      /* 24px */
+  --radius-full: 9999px;     /* 完全な円 */
+
+  /* ================================
+   * SHADOW SCALE
+   * ================================ */
+  
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-base: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  --shadow-2xl: 0 50px 100px -20px rgb(0 0 0 / 0.25);
+  --shadow-inner: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+
+  /* ================================
+   * Z-INDEX SCALE
+   * ================================ */
+  
+  --z-0: 0;
+  --z-10: 10;
+  --z-20: 20;
+  --z-30: 30;
+  --z-40: 40;
+  --z-50: 50;     /* Header, Fixed Navigation */
+  --z-modal: 1000; /* Modal Dialog */
+  --z-popover: 1010; /* Dropdown, Tooltip */
+  --z-toast: 1020;   /* Toast Notification */
+  --z-max: 9999;     /* Always on top */
+
+  /* ================================
+   * ANIMATION & TRANSITIONS
+   * ================================ */
+  
+  --transition-none: none;
+  --transition-all: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-default: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: 100ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Easing Functions */
+  --ease-linear: linear;
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ================================
+   * RESPONSIVE BREAKPOINTS
+   * ================================ */
+  
+  /* Atlassian Design System Breakpoints (Mobile First) */
+  --breakpoint-xs: 0px;       /* 0px - 479px: Small mobile */
+  --breakpoint-sm: 480px;     /* 480px - 767px: Large mobile */
+  --breakpoint-md: 768px;     /* 768px - 1023px: Tablet */
+  --breakpoint-lg: 1024px;    /* 1024px - 1279px: Desktop */
+  --breakpoint-xl: 1280px;    /* 1280px - 1439px: Large desktop */
+  --breakpoint-2xl: 1440px;   /* 1440px+: Extra large desktop */
+
+  /* Container Max Widths */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+  --container-2xl: 1440px;
+
+  /* Grid System (8pt base) */
+  --grid-columns: 12;
+  --grid-gutter: var(--space-4);        /* 16px */
+  --grid-gutter-sm: var(--space-2);     /* 8px on mobile */
+  --grid-margin: var(--space-4);        /* 16px */
+  --grid-margin-sm: var(--space-2);     /* 8px on mobile */
+
+  /* Component Responsive Scales */
+  --text-scale-mobile: 0.875;    /* 14px base on mobile */
+  --text-scale-tablet: 1;        /* 16px base on tablet+ */
+  --component-scale-mobile: 0.9; /* Slightly smaller components on mobile */
+}
+
+/* ================================
+ * DARK MODE OVERRIDES
+ * ================================ */
+
+.dark {
+  /* Brand colors remain the same but adjust contrast */
+  --color-brand-50: oklch(0.15 0.015 70);      /* Darkest becomes lightest */
+  --color-brand-900: oklch(0.85 0.09 70);      /* Lightest becomes darkest */
+  
+  /* Neutral colors inverted for dark mode */
+  --color-neutral-50: oklch(0.19 0.024 270);   /* Dark gray */
+  --color-neutral-100: oklch(0.21 0.022 270);
+  --color-neutral-200: oklch(0.25 0.020 270);
+  --color-neutral-300: oklch(0.32 0.018 270);
+  --color-neutral-400: oklch(0.45 0.015 270);
+  --color-neutral-500: oklch(0.58 0.012 270);
+  --color-neutral-600: oklch(0.70 0.010 270);
+  --color-neutral-700: oklch(0.80 0.008 270);
+  --color-neutral-800: oklch(0.88 0.006 270);
+  --color-neutral-900: oklch(0.94 0.004 270);   /* Light gray */
+  --color-neutral-950: oklch(0.97 0.002 270);   /* Almost white */
+  
+  /* Adjust shadows for dark mode */
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4);
+  --shadow-base: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.4);
+  --shadow-xl: 0 25px 50px -12px rgb(0 0 0 / 0.6);
+  --shadow-2xl: 0 50px 100px -20px rgb(0 0 0 / 0.6);
+}
