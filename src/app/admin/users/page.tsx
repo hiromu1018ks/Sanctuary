@@ -4,18 +4,20 @@ import { useUserManagement } from "@/hooks/useUserManagement";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
-// ステータス表示用のバッジコンポーネント
+// ユーザーのステータス（承認待ち・承認済み・拒否済み）を表示するバッジコンポーネント
 function StatusBadge({
   status,
 }: {
   status: "pending" | "approved" | "rejected";
 }) {
+  // ステータスごとのスタイル定義
   const styles = {
     pending: "bg-orange-100 text-orange-800 border-orange-200",
     approved: "bg-green-100 text-green-800 border-green-200",
     rejected: "bg-red-100 text-red-800 border-red-200",
   };
 
+  // ステータスごとのラベル定義
   const labels = {
     pending: "承認待ち",
     approved: "承認済み",
@@ -24,18 +26,19 @@ function StatusBadge({
 
   return (
     <span
-      className={`inline-flex items-center
-  px-2.5 py-0.5 rounded-full text-xs font-medium
-  border ${styles[status]}`}
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${styles[status]}`}
     >
       {labels[status]}
     </span>
   );
 }
 
+// ユーザー管理画面のコンポーネント
 export default function UserManagement() {
+  // ユーザー管理用のカスタムフックから必要な値を取得
   const { users, loading, error, updating, refetch, updateUserStatus } =
     useUserManagement();
+  // ステータスフィルターの状態管理
   const [statusFilter, setStatusFilter] = useState<
     "all" | "pending" | "approved" | "rejected"
   >("all");
@@ -56,12 +59,13 @@ export default function UserManagement() {
     }
   };
 
-  // フィルタリング処理
+  // ユーザー一覧のフィルタリング処理
   const filteredUsers =
     statusFilter === "all"
       ? users
       : users.filter(user => user.status === statusFilter);
 
+  // ローディング中の表示
   if (loading) {
     return (
       <div>
@@ -80,6 +84,7 @@ export default function UserManagement() {
     );
   }
 
+  // エラー発生時の表示
   if (error) {
     return (
       <div>
@@ -97,8 +102,10 @@ export default function UserManagement() {
     );
   }
 
+  // 通常表示（ユーザー一覧）
   return (
     <div>
+      {/* ヘッダーと更新ボタン */}
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold text-gray-900">ユーザー管理</h1>
         <Button onClick={refetch} variant="outline">
@@ -106,7 +113,7 @@ export default function UserManagement() {
         </Button>
       </div>
 
-      {/* フィルター */}
+      {/* ステータスフィルター */}
       <div className="mb-6">
         <div className="flex space-x-2">
           <Button
@@ -146,27 +153,34 @@ export default function UserManagement() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
+                {/* ユーザー名・メールアドレス */}
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   ユーザー
                 </th>
+                {/* ステータス */}
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   ステータス
                 </th>
+                {/* 権限 */}
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   権限
                 </th>
+                {/* 活動情報 */}
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   活動
                 </th>
+                {/* 登録日 */}
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   登録日
                 </th>
+                {/* アクションボタン */}
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   アクション
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
+              {/* ユーザーごとの行 */}
               {filteredUsers.map(user => (
                 <tr key={user.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -193,6 +207,7 @@ export default function UserManagement() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
+                      {/* 承認ボタン（承認済み以外の場合表示） */}
                       {user.status !== "approved" && (
                         <Button
                           onClick={() =>
@@ -205,6 +220,7 @@ export default function UserManagement() {
                           {updating === user.id ? "更新中..." : "承認"}
                         </Button>
                       )}
+                      {/* 拒否ボタン（拒否済み以外の場合表示） */}
                       {user.status !== "rejected" && (
                         <Button
                           onClick={() =>
@@ -217,6 +233,7 @@ export default function UserManagement() {
                           {updating === user.id ? "更新中..." : "拒否"}
                         </Button>
                       )}
+                      {/* 保留ボタン（承認待ち以外の場合表示） */}
                       {user.status !== "pending" && (
                         <Button
                           onClick={() => handleStatusUpdate(user.id, "pending")}
@@ -235,6 +252,7 @@ export default function UserManagement() {
           </table>
         </div>
 
+        {/* ユーザーがいない場合の表示 */}
         {filteredUsers.length === 0 && (
           <div className="text-center py-12">
             <p className="text-gray-500">
