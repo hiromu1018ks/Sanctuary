@@ -89,3 +89,15 @@ body {
 .skip-link:focus {
   top: 6px;
 }
+
+/* Modal専用スタイリング */
+.modal-backdrop-blur {
+  backdrop-filter: blur(8px);
+}
+
+/* カラー拡張 */
+:root {
+  --color-red-25: #fef2f2;
+  --color-green-25: #f0fdf4;
+  --color-blue-25: #eff6ff;
+}

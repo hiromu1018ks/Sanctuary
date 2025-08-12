@@ -33,13 +33,13 @@ export default function SuggestionModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white">
+        <DialogHeader className="bg-white">
           <DialogTitle className="flex items-center text-orange-800">
-<Lightbulb className="inline w-5 h-5 mr-2" />
+            <Lightbulb className="inline w-5 h-5 mr-2" />
             投稿内容の改善提案
           </DialogTitle>
-          <DialogDescription className="text-gray-600">
+          <DialogDescription className="text-gray-700 font-medium">
             より前向きな表現での投稿をご提案します。お気に入りの表現に編集してからご投稿ください
           </DialogDescription>
         </DialogHeader>
@@ -48,7 +48,7 @@ export default function SuggestionModal({
           <Card className="border-red-200">
             <CardHeader>
               <CardTitle className="text-sm font-medium text-red-700">
-<Circle className="inline w-4 h-4 mr-2 text-red-600" />
+                <Circle className="inline w-4 h-4 mr-2 text-red-600" />
                 元の投稿内容
               </CardTitle>
             </CardHeader>
@@ -64,7 +64,7 @@ export default function SuggestionModal({
           <Card className="border-green-200">
             <CardHeader>
               <CardTitle className="text-sm font-medium text-green-700">
-<Sparkles className="inline w-4 h-4 mr-2" />
+                <Sparkles className="inline w-4 h-4 mr-2" />
                 改善提案
               </CardTitle>
             </CardHeader>
@@ -79,14 +79,14 @@ export default function SuggestionModal({
 
           <div className="flex flex-col sm:flex-row gap-3 justify-end pt-4 border-t">
             <Button variant="outline" onClick={onClose} className="sm:order-1">
-<Edit className="inline w-4 h-4 mr-2" />
+              <Edit className="inline w-4 h-4 mr-2" />
               自分で編集を続ける
             </Button>
             <Button
               onClick={handleAccept}
               className="bg-green-600 hover:bg-green-700 text-white sm:order-2"
             >
-<CheckCircle className="inline w-4 h-4 mr-2" />
+              <CheckCircle className="inline w-4 h-4 mr-2" />
               この提案を使う
             </Button>
           </div>
