@@ -1,6 +1,14 @@
 import { Post } from "@/types/post";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Button } from "../ui/button";
+import { 
+  Heart, 
+  MessageCircle, 
+  Share2, 
+  MoreHorizontal,
+  Clock
+} from "lucide-react";
 
 // 投稿カードのプロパティ型定義
 interface PostCardProps {
@@ -61,61 +69,110 @@ export const PostCard = ({ post }: PostCardProps) => {
 
   return (
     <Card 
-      className="mb-3 sm:mb-4 shadow-sm hover:shadow-md transition-shadow focus-within:ring-2 focus-within:ring-orange-500 focus-within:ring-offset-2"
+      className="mb-4 bg-white border-0 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 focus-within:ring-2 focus-within:ring-orange-500 focus-within:ring-offset-2 overflow-hidden"
       role="article"
       aria-labelledby={authorId}
       aria-describedby={`${contentId} ${timeId}`}
       id={postId}
     >
-      <CardHeader className="pb-3">
-        <div className="flex items-center space-x-3">
-          <Avatar>
-            <AvatarImage 
-              src={userAvatar || undefined} 
-              alt={`${userName}のプロフィール画像`}
-            />
-            <AvatarFallback 
-              className="bg-orange-100 text-orange-800"
-              aria-label={`${userName}のイニシャル`}
-            >
-              {/* ユーザー名の先頭文字を表示 */}
-              {userName.charAt(0)}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <div className="flex items-center space-x-2">
-              <span 
-                id={authorId}
-                className="font-medium text-gray-900"
-                role="heading"
-                aria-level="3"
+      <CardHeader className="pb-4 bg-gradient-to-r from-orange-25 to-white">
+        <div className="flex items-start justify-between">
+          <div className="flex items-center space-x-3">
+            <Avatar className="ring-2 ring-orange-100 ring-offset-1">
+              <AvatarImage 
+                src={userAvatar || undefined} 
+                alt={`${userName}のプロフィール画像`}
+                className="object-cover"
+              />
+              <AvatarFallback 
+                className="bg-gradient-to-br from-orange-400 to-orange-600 text-white font-semibold"
+                aria-label={`${userName}のイニシャル`}
               >
-                {userName}
-              </span>
-              <time 
-                id={timeId}
-                className="text-sm text-gray-500"
-                dateTime={post.created_at}
-                title={fullDateTime}
-                aria-label={`投稿日時: ${fullDateTime}`}
-              >
-                {/* 投稿日時を相対時間で表示 */}
-                <span aria-hidden="true">{relativeTime}</span>
-                <span className="sr-only">に投稿</span>
-              </time>
+                {userName.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <div className="flex items-center space-x-2">
+                <span 
+                  id={authorId}
+                  className="font-semibold text-gray-900 hover:text-orange-600 transition-colors cursor-pointer"
+                  role="heading"
+                  aria-level="3"
+                >
+                  {userName}
+                </span>
+              </div>
+              <div className="flex items-center space-x-1 mt-1">
+                <Clock className="w-3 h-3 text-gray-400" aria-hidden="true" />
+                <time 
+                  id={timeId}
+                  className="text-xs text-gray-500"
+                  dateTime={post.created_at}
+                  title={fullDateTime}
+                  aria-label={`投稿日時: ${fullDateTime}`}
+                >
+                  <span aria-hidden="true">{relativeTime}</span>
+                  <span className="sr-only">に投稿</span>
+                </time>
+              </div>
             </div>
           </div>
+          
+          {/* メニューボタン */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full p-2 h-8 w-8 -mr-2"
+            aria-label="投稿メニュー"
+          >
+            <MoreHorizontal className="w-4 h-4" />
+          </Button>
         </div>
       </CardHeader>
-      <CardContent>
+      
+      <CardContent className="pb-4">
         <div 
           id={contentId}
-          className="text-gray-800 leading-relaxed whitespace-pre-wrap"
+          className="text-gray-800 leading-relaxed whitespace-pre-wrap text-[15px] mb-4"
           role="text"
           aria-label="投稿内容"
         >
-          {/* 投稿内容を表示 */}
           {post.content}
+        </div>
+        
+        {/* インタラクションボタン */}
+        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+          <div className="flex items-center space-x-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-lg px-3 py-2 h-9 transition-all duration-200"
+              aria-label="いいね"
+            >
+              <Heart className="w-4 h-4 mr-1" />
+              <span className="text-sm font-medium">0</span>
+            </Button>
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-gray-500 hover:text-blue-500 hover:bg-blue-50 rounded-lg px-3 py-2 h-9 transition-all duration-200"
+              aria-label="コメント"
+            >
+              <MessageCircle className="w-4 h-4 mr-1" />
+              <span className="text-sm font-medium">0</span>
+            </Button>
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-gray-500 hover:text-green-500 hover:bg-green-50 rounded-lg px-3 py-2 h-9 transition-all duration-200"
+              aria-label="シェア"
+            >
+              <Share2 className="w-4 h-4 mr-1" />
+              <span className="text-sm font-medium">シェア</span>
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>

@@ -171,14 +171,16 @@ export const PostForm = () => {
   const isOverLimit = postContent.length > MAX_CHARS;
 
   return (
-    <div className="container-responsive max-w-2xl">
-      <Card className="shadow-lg">
-        <CardHeader>
+    <div className="w-full">
+      <Card className="bg-white border-0 shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden">
+        <CardHeader className="pb-4 bg-gradient-to-r from-orange-25 to-white border-b border-orange-100">
           <CardTitle
-            className="flex items-center text-orange-800"
+            className="flex items-center text-orange-800 font-bold text-lg"
             id="form-title"
           >
-<Sparkles className="w-5 h-5 mr-2 inline" />
+            <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center mr-3 shadow-md">
+              <Sparkles className="w-5 h-5 text-white" />
+            </div>
             新しい投稿を作成
           </CardTitle>
         </CardHeader>
@@ -207,7 +209,7 @@ export const PostForm = () => {
                 value={postContent}
                 onChange={e => setPostContent(e.target.value)}
                 maxLength={MAX_CHARS}
-                className="min-h-32"
+                className="min-h-32 border-gray-200 focus:border-orange-400 focus:ring-orange-400 focus:ring-2 focus:ring-offset-0 rounded-lg transition-all duration-200 resize-none"
                 disabled={isSubmitting}
                 required
                 aria-required="true"
@@ -231,37 +233,55 @@ export const PostForm = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 sm:gap-0">
-              <div
-                id={charCountId}
-                className={`text-sm font-medium ${getCharCountColor()}`}
-                role="status"
-                aria-live="polite"
-                aria-label={`文字数: ${postContent.length}文字 / ${MAX_CHARS}文字`}
-              >
-                <span aria-hidden="true">
-                  {postContent.length}/{MAX_CHARS}
-                </span>
-                <span className="sr-only">
-                  現在{postContent.length}文字入力されています。最大{MAX_CHARS}
-                  文字まで入力可能です。
-                </span>
-
-                {/* 制限に近づいた際の追加警告 */}
-                {postContent.length > 450 && (
-                  <span
-                    className="ml-2 text-xs"
-                    role="alert"
-                    aria-live="assertive"
-                  >
-                    <span aria-hidden="true">
-警告: 上限まであと{MAX_CHARS - postContent.length}文字
-                    </span>
-                    <span className="sr-only">
-                      警告: 文字数制限まであと{MAX_CHARS - postContent.length}
-                      文字です
-                    </span>
+              <div className="space-y-2">
+                {/* プログレスバー */}
+                <div className="w-full max-w-xs">
+                  <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full transition-all duration-300 rounded-full ${
+                        postContent.length > 450 
+                          ? 'bg-red-500' 
+                          : postContent.length > 400 
+                          ? 'bg-orange-500' 
+                          : 'bg-orange-400'
+                      }`}
+                      style={{ width: `${Math.min((postContent.length / MAX_CHARS) * 100, 100)}%` }}
+                    />
+                  </div>
+                </div>
+                
+                <div
+                  id={charCountId}
+                  className={`text-sm font-medium ${getCharCountColor()}`}
+                  role="status"
+                  aria-live="polite"
+                  aria-label={`文字数: ${postContent.length}文字 / ${MAX_CHARS}文字`}
+                >
+                  <span aria-hidden="true">
+                    {postContent.length}/{MAX_CHARS}
                   </span>
-                )}
+                  <span className="sr-only">
+                    現在{postContent.length}文字入力されています。最大{MAX_CHARS}
+                    文字まで入力可能です。
+                  </span>
+
+                  {/* 制限に近づいた際の追加警告 */}
+                  {postContent.length > 450 && (
+                    <span
+                      className="ml-2 text-xs"
+                      role="alert"
+                      aria-live="assertive"
+                    >
+                      <span aria-hidden="true">
+  警告: 上限まであと{MAX_CHARS - postContent.length}文字
+                      </span>
+                      <span className="sr-only">
+                        警告: 文字数制限まであと{MAX_CHARS - postContent.length}
+                        文字です
+                      </span>
+                    </span>
+                  )}
+                </div>
               </div>
 
               <Button
@@ -269,12 +289,20 @@ export const PostForm = () => {
                 disabled={
                   postContent.trim().length === 0 || isSubmitting || isOverLimit
                 }
-                className="bg-orange-500 hover:bg-orange-600"
-                isLoading={isSubmitting}
-                loadingText="投稿を送信中です"
+                className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold px-8 py-3 rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 aria-describedby={validationError ? validationId : undefined}
               >
-                {isSubmitting ? "送信中..." : "投稿"}
+                {isSubmitting ? (
+                  <span className="flex items-center">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                    送信中...
+                  </span>
+                ) : (
+                  <span className="flex items-center">
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    投稿
+                  </span>
+                )}
               </Button>
             </div>
 
@@ -282,27 +310,53 @@ export const PostForm = () => {
             {message && (
               <div
                 id={messageId}
-                className={`text-sm font-medium mt-2 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                className={`text-sm font-medium mt-4 p-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-sm border-l-4 transform transition-all duration-300 ${
                   message.includes("成功:")
-                    ? "bg-green-50 text-green-800 border border-green-200 focus:ring-green-500"
+                    ? "bg-gradient-to-r from-green-50 to-emerald-50 text-green-800 border-l-green-500 border border-green-200 focus:ring-green-500"
                     : message.includes("提案:")
-                      ? "bg-yellow-50 text-yellow-800 border border-yellow-200 focus:ring-yellow-500"
-                      : "bg-red-50 text-red-800 border border-red-200 focus:ring-red-500"
+                      ? "bg-gradient-to-r from-yellow-50 to-amber-50 text-yellow-800 border-l-yellow-500 border border-yellow-200 focus:ring-yellow-500"
+                      : "bg-gradient-to-r from-red-50 to-rose-50 text-red-800 border-l-red-500 border border-red-200 focus:ring-red-500"
                 }`}
                 role={message.includes("エラー:") ? "alert" : "status"}
                 aria-live="polite"
                 tabIndex={-1}
               >
-                <div className="whitespace-pre-line">
-                  {/* スクリーンリーダー用のプレフィックス */}
-                  <span className="sr-only">
-                    {message.includes("成功:")
-                      ? "成功: "
+                <div className="flex items-start space-x-3">
+                  {/* アイコン表示 */}
+                  <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${
+                    message.includes("成功:")
+                      ? "bg-green-100"
                       : message.includes("提案:")
-                        ? "情報: "
-                        : "エラー: "}
-                  </span>
-                  {message}
+                        ? "bg-yellow-100"
+                        : "bg-red-100"
+                  }`}>
+                    {message.includes("成功:") ? (
+                      <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    ) : message.includes("提案:") ? (
+                      <svg className="w-4 h-4 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                    ) : (
+                      <svg className="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </div>
+                  
+                  {/* メッセージ本文 */}
+                  <div className="flex-1 whitespace-pre-line leading-relaxed">
+                    {/* スクリーンリーダー用のプレフィックス */}
+                    <span className="sr-only">
+                      {message.includes("成功:")
+                        ? "成功: "
+                        : message.includes("提案:")
+                          ? "情報: "
+                          : "エラー: "}
+                    </span>
+                    {message}
+                  </div>
                 </div>
               </div>
             )}

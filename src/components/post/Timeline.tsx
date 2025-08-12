@@ -74,7 +74,7 @@ export const Timeline = () => {
   }
 
   return (
-    <div className="container-responsive max-w-2xl">
+    <div className="w-full">
       {/* メインコンテンツエリア */}
       <main
         id="main-content"

@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Timeline } from "@/components/post/Timeline";
 import { Header } from "@/components/layout/Header";
+import { ThreeColumnLayout } from "@/components/layout/ThreeColumnLayout";
+import { LeftSidebar } from "@/components/layout/LeftSidebar";
+import { RightSidebar } from "@/components/layout/RightSidebar";
 import { LogIn, House } from "lucide-react";
 
 export default function Home() {
@@ -59,11 +62,14 @@ export default function Home() {
       {/* ヘッダー部分 */}
       <Header />
 
-      {/* メインコンテンツ */}
-      <main className="max-w-4xl mx-auto py-8">
+      {/* 3カラムレイアウト */}
+      <ThreeColumnLayout
+        leftSidebar={<LeftSidebar />}
+        rightSidebar={<RightSidebar />}
+      >
         <PostForm />
         <Timeline />
-      </main>
+      </ThreeColumnLayout>
     </div>
   );
 }
