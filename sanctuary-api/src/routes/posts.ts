@@ -238,4 +238,146 @@ app.delete("/:id", async c => {
   }
 });
 
+// リアクション作成エンドポイント
+app.post("/:postId/reactions", async c => {
+  try {
+    const postId = c.req.param("postId");
+    const body = await c.req.json();
+
+    // バリデーション: 必須パラメータ確認
+    if (!body.user_id || !body.reactionType) {
+      return c.json(
+        {
+          error: "user_id and reactionType are required",
+        },
+        400
+      );
+    }
+
+    // リアクション種類の妥当性確認
+    const validReactionTypes = ["thanks", "support", "empathy", "wonderful"];
+    if (!validReactionTypes.includes(body.reactionType)) {
+      return c.json(
+        {
+          error: "Invalid reaction type",
+        },
+        400
+      );
+    }
+
+    // 投稿存在確認
+    const existingPost = await prisma.post.findUnique({
+      where: {
+        id: postId,
+        status: "approved",
+      },
+    });
+
+    if (!existingPost) {
+      return c.json({ error: "Post not found or not approved" }, 404);
+    }
+
+    // ユーザープロフィール取得
+    const userProfile = await prisma.userProfile.findUnique({
+      where: { userId: body.user_id },
+    });
+
+    if (!userProfile) {
+      return c.json({ error: "User profile not found" }, 404);
+    }
+
+    // リアクション作成(upsert で重複対応)
+    // prisma.reaction.upsert を使って、リアクションが既に存在する場合は更新、存在しない場合は新規作成する
+    const reaction = await prisma.reaction.upsert({
+      where: {
+        // 複合ユニークキー（postId, userProfileId, reactionType）でリアクションを特定
+        postId_userProfileId_reactionType: {
+          postId: postId,
+          userProfileId: userProfile.id,
+          reactionType: body.reactionType,
+        },
+      },
+      create: {
+        // リアクションが存在しない場合に新規作成するデータ
+        postId: postId,
+        userProfileId: userProfile.id,
+        reactionType: body.reactionType,
+      },
+      update: {
+        // 既存の場合は更新（実質的に何も変更しない）
+      },
+      include: {
+        userProfile: {
+          include: {
+            user: {
+              select: {
+                name: true, // ユーザー名を取得
+                image: true, // ユーザー画像を取得
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // リアクション集計の最新情報を取得
+    // reactionテーブルから、postIdごとにreactionType別の件数を集計
+    const reactionCounts = await prisma.reaction.groupBy({
+      by: ["reactionType"],
+      where: { postId: postId },
+      _count: { id: true },
+    });
+
+    // 各リアクションタイプごとの初期値を0で用意
+    const counts = {
+      thanks: 0,
+      support: 0,
+      empathy: 0,
+      wonderful: 0,
+    };
+
+    // 集計結果をcountsオブジェクトに反映
+    reactionCounts.forEach(item => {
+      counts[item.reactionType as keyof typeof counts] = item._count.id;
+    });
+
+    // レスポンスとして、作成されたリアクション情報と最新のリアクション集計を返す
+    return c.json(
+      {
+        data: {
+          reaction: {
+            id: reaction.id, // リアクションID
+            postId: reaction.postId, // 投稿ID
+            userProfileId: reaction.userProfileId, // リアクションしたユーザープロフィールID
+            reactionType: reaction.reactionType, // リアクションタイプ
+            createdAt: reaction.createdAt.toISOString(), // 作成日時（ISO文字列）
+            userProfile: {
+              nickname: reaction.userProfile.nickname, // ユーザーニックネーム
+              profileImageUrl: reaction.userProfile.profileImageUrl, // プロフィール画像URL
+              user: {
+                name: reaction.userProfile.user.name, // ユーザー名
+                image: reaction.userProfile.user.image, // ユーザー画像
+              },
+            },
+          },
+          counts: counts, // 各リアクションタイプごとの件数
+        },
+        error: null, // エラー情報（今回は常にnull）
+        timestamp: new Date().toISOString(), // レスポンス生成時刻
+      },
+      201 // HTTPステータスコード: Created
+    );
+  } catch (error) {
+    console.error("Error creating reaction:", error);
+    return c.json(
+      {
+        data: null,
+        error: "Failed to create reaction",
+        timestamp: new Date().toISOString(),
+      },
+      500
+    );
+  }
+});
+
 export default app;
