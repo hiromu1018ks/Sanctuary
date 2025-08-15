@@ -2,13 +2,14 @@ import { Post } from "@/types/post";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
-import { 
-  Heart, 
-  MessageCircle, 
-  Share2, 
+import {
+  Heart,
+  MessageCircle,
+  Share2,
   MoreHorizontal,
-  Clock
+  Clock,
 } from "lucide-react";
+import { ReactionBar } from "./ReactionBar";
 
 // 投稿カードのプロパティ型定義
 interface PostCardProps {
@@ -23,10 +24,10 @@ export const PostCard = ({ post }: PostCardProps) => {
   const userAvatar = post.user?.profile_image_url;
 
   // アクセシビリティ用のユニークID生成
-  const postId = `post-${post.id}`;
-  const authorId = `author-${post.id}`;
-  const contentId = `content-${post.id}`;
-  const timeId = `time-${post.id}`;
+  const postId = `post-${post.post_id}`;
+  const authorId = `author-${post.post_id}`;
+  const contentId = `content-${post.post_id}`;
+  const timeId = `time-${post.post_id}`;
 
   // 投稿日時を相対時間で表示する関数
   const formatRelativeTime = (dateString: string): string => {
@@ -68,7 +69,7 @@ export const PostCard = ({ post }: PostCardProps) => {
   const fullDateTime = formatFullDateTime(post.created_at);
 
   return (
-    <Card 
+    <Card
       className="mb-4 bg-white border-0 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 focus-within:ring-2 focus-within:ring-orange-500 focus-within:ring-offset-2 overflow-hidden"
       role="article"
       aria-labelledby={authorId}
@@ -79,12 +80,12 @@ export const PostCard = ({ post }: PostCardProps) => {
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-3">
             <Avatar className="ring-2 ring-orange-100 ring-offset-1">
-              <AvatarImage 
-                src={userAvatar || undefined} 
+              <AvatarImage
+                src={userAvatar || undefined}
                 alt={`${userName}のプロフィール画像`}
                 className="object-cover"
               />
-              <AvatarFallback 
+              <AvatarFallback
                 className="bg-gradient-to-br from-orange-400 to-orange-600 text-white font-semibold"
                 aria-label={`${userName}のイニシャル`}
               >
@@ -93,7 +94,7 @@ export const PostCard = ({ post }: PostCardProps) => {
             </Avatar>
             <div className="flex-1">
               <div className="flex items-center space-x-2">
-                <span 
+                <span
                   id={authorId}
                   className="font-semibold text-gray-900 hover:text-orange-600 transition-colors cursor-pointer"
                   role="heading"
@@ -104,7 +105,7 @@ export const PostCard = ({ post }: PostCardProps) => {
               </div>
               <div className="flex items-center space-x-1 mt-1">
                 <Clock className="w-3 h-3 text-gray-400" aria-hidden="true" />
-                <time 
+                <time
                   id={timeId}
                   className="text-xs text-gray-500"
                   dateTime={post.created_at}
@@ -117,7 +118,7 @@ export const PostCard = ({ post }: PostCardProps) => {
               </div>
             </div>
           </div>
-          
+
           {/* メニューボタン */}
           <Button
             variant="ghost"
@@ -129,9 +130,9 @@ export const PostCard = ({ post }: PostCardProps) => {
           </Button>
         </div>
       </CardHeader>
-      
+
       <CardContent className="pb-4">
-        <div 
+        <div
           id={contentId}
           className="text-gray-800 leading-relaxed whitespace-pre-wrap text-[15px] mb-4"
           role="text"
@@ -139,40 +140,47 @@ export const PostCard = ({ post }: PostCardProps) => {
         >
           {post.content}
         </div>
-        
+
         {/* インタラクションボタン */}
-        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-          <div className="flex items-center space-x-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-lg px-3 py-2 h-9 transition-all duration-200"
-              aria-label="いいね"
-            >
-              <Heart className="w-4 h-4 mr-1" />
-              <span className="text-sm font-medium">0</span>
-            </Button>
-            
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-gray-500 hover:text-blue-500 hover:bg-blue-50 rounded-lg px-3 py-2 h-9 transition-all duration-200"
-              aria-label="コメント"
-            >
-              <MessageCircle className="w-4 h-4 mr-1" />
-              <span className="text-sm font-medium">0</span>
-            </Button>
-            
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-gray-500 hover:text-green-500 hover:bg-green-50 rounded-lg px-3 py-2 h-9 transition-all duration-200"
-              aria-label="シェア"
-            >
-              <Share2 className="w-4 h-4 mr-1" />
-              <span className="text-sm font-medium">シェア</span>
-            </Button>
-          </div>
+        {/* リアクションバー */}
+        <ReactionBar
+          postId={post.post_id}
+          reactions={{
+            thanks: 0,
+            support: 0,
+            empathy: 0,
+            wonderful: 0,
+          }}
+          userReactions={{
+            thanks: false,
+            support: false,
+            empathy: false,
+            wonderful: false,
+          }}
+          loading={false}
+          className="mt-3"
+        />
+        {/* 従来のコメント・シェアボタンは維持 */}
+        <div className="flex items-center justify-end space-x-1 pt-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-gray-500 hover:text-blue-500 hover:bg-blue-50 rounded-lg px-3 py-2 h-9"
+            aria-label="コメント"
+          >
+            <MessageCircle className="w-4 h-4 mr-1" />
+            <span className="text-sm font-medium">0</span>
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-gray-500 hover:text-green-500 hover:bg-green-50 rounded-lg px-3 py-2 h-9"
+            aria-label="シェア"
+          >
+            <Share2 className="w-4 h-4 mr-1" />
+            <span className="text-sm font-medium">シェア</span>
+          </Button>
         </div>
       </CardContent>
     </Card>
