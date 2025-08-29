@@ -1,6 +1,8 @@
+import React from "react";
 import { cn } from "@/lib/utils";
-import { REACTION_TYPES, ReactionBarProps } from "@/types/reaction";
+import { REACTION_TYPES } from "@/types/reaction";
 import ReactionButton from "./ReactionButton";
+import { useReactions } from "@/hooks/useReactions";
 
 /**
  * リアクションバーコンポーネント
@@ -10,19 +12,13 @@ import ReactionButton from "./ReactionButton";
  * - 各ボタンの状態管理とクリックイベント処理
  * - レスポンシブ対応とスペーシング調整
  */
-export const ReactionBar: React.FC<ReactionBarProps> = ({
+export const ReactionBar: React.FC<{ postId: string; className?: string }> = React.memo(({
   postId,
-  reactions,
-  userReactions,
-  loading = false,
-  error,
   className,
 }) => {
-  // リアクションのトグル処理（クリック時に呼ばれる）
-  const handleToggleReaction = async (postId: string, reactionType: string) => {
-    console.log("Toggle reaction:", { postId, reactionType });
-    // TODO: Step3で実装するuseReactionsフックで置き換え
-  };
+  console.log(`🎯 ReactionBar レンダリング: ${postId}`);
+  const { reactions, userReactions, loading, error, toggleReaction } =
+    useReactions(postId);
 
   // エラー時の表示
   if (error) {
@@ -51,12 +47,12 @@ export const ReactionBar: React.FC<ReactionBarProps> = ({
           count={reactions[reactionType] || 0}
           isActive={userReactions[reactionType] || false}
           isLoading={loading}
-          onToggle={handleToggleReaction}
+          onToggle={toggleReaction}
           className="flex-1 justify-center min-w-0"
         />
       ))}
     </div>
   );
-};
+});
 
 export default ReactionBar;

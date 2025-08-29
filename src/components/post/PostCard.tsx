@@ -143,23 +143,7 @@ export const PostCard = ({ post }: PostCardProps) => {
 
         {/* インタラクションボタン */}
         {/* リアクションバー */}
-        <ReactionBar
-          postId={post.post_id}
-          reactions={{
-            thanks: 0,
-            support: 0,
-            empathy: 0,
-            wonderful: 0,
-          }}
-          userReactions={{
-            thanks: false,
-            support: false,
-            empathy: false,
-            wonderful: false,
-          }}
-          loading={false}
-          className="mt-3"
-        />
+        <ReactionBar postId={post.post_id} className="mt-3" />
         {/* 従来のコメント・シェアボタンは維持 */}
         <div className="flex items-center justify-end space-x-1 pt-2">
           <Button

@@ -1,9 +1,9 @@
 "use client";
-import React, { useState } from "react";
-import { Sparkles } from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { Sparkles } from "lucide-react";
+import React, { useState } from "react";
 import SuggestionModal from "./SuggestionModal";
 
 const sanitizePostContent = (content: string): string => {
@@ -237,19 +237,21 @@ export const PostForm = () => {
                 {/* プログレスバー */}
                 <div className="w-full max-w-xs">
                   <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div 
+                    <div
                       className={`h-full transition-all duration-300 rounded-full ${
-                        postContent.length > 450 
-                          ? 'bg-red-500' 
-                          : postContent.length > 400 
-                          ? 'bg-orange-500' 
-                          : 'bg-orange-400'
+                        postContent.length > 450
+                          ? "bg-red-500"
+                          : postContent.length > 400
+                            ? "bg-orange-500"
+                            : "bg-orange-400"
                       }`}
-                      style={{ width: `${Math.min((postContent.length / MAX_CHARS) * 100, 100)}%` }}
+                      style={{
+                        width: `${Math.min((postContent.length / MAX_CHARS) * 100, 100)}%`,
+                      }}
                     />
                   </div>
                 </div>
-                
+
                 <div
                   id={charCountId}
                   className={`text-sm font-medium ${getCharCountColor()}`}
@@ -261,7 +263,8 @@ export const PostForm = () => {
                     {postContent.length}/{MAX_CHARS}
                   </span>
                   <span className="sr-only">
-                    現在{postContent.length}文字入力されています。最大{MAX_CHARS}
+                    現在{postContent.length}文字入力されています。最大
+                    {MAX_CHARS}
                     文字まで入力可能です。
                   </span>
 
@@ -273,7 +276,7 @@ export const PostForm = () => {
                       aria-live="assertive"
                     >
                       <span aria-hidden="true">
-  警告: 上限まであと{MAX_CHARS - postContent.length}文字
+                        警告: 上限まであと{MAX_CHARS - postContent.length}文字
                       </span>
                       <span className="sr-only">
                         警告: 文字数制限まであと{MAX_CHARS - postContent.length}
@@ -323,28 +326,54 @@ export const PostForm = () => {
               >
                 <div className="flex items-start space-x-3">
                   {/* アイコン表示 */}
-                  <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${
-                    message.includes("成功:")
-                      ? "bg-green-100"
-                      : message.includes("提案:")
-                        ? "bg-yellow-100"
-                        : "bg-red-100"
-                  }`}>
+                  <div
+                    className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${
+                      message.includes("成功:")
+                        ? "bg-green-100"
+                        : message.includes("提案:")
+                          ? "bg-yellow-100"
+                          : "bg-red-100"
+                    }`}
+                  >
                     {message.includes("成功:") ? (
-                      <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      <svg
+                        className="w-4 h-4 text-green-600"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                     ) : message.includes("提案:") ? (
-                      <svg className="w-4 h-4 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      <svg
+                        className="w-4 h-4 text-yellow-600"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                     ) : (
-                      <svg className="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                      <svg
+                        className="w-4 h-4 text-red-600"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                     )}
                   </div>
-                  
+
                   {/* メッセージ本文 */}
                   <div className="flex-1 whitespace-pre-line leading-relaxed">
                     {/* スクリーンリーダー用のプレフィックス */}
@@ -373,4 +402,3 @@ export const PostForm = () => {
     </div>
   );
 };
-

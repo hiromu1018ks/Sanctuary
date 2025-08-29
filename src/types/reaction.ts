@@ -155,7 +155,7 @@ export interface UseReactionsReturn {
   userReactions: UserReactionState;
   loading: boolean;
   error: string | null;
-  toggleReaction: (type: ReactionType) => Promise<void>;
+  toggleReaction: (postId: string, type: ReactionType) => Promise<void>;
   refetch: () => Promise<void>;
   hasReactions: boolean;
   totalCount: number;
