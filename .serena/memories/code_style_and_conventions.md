@@ -1,0 +1,24 @@
+# Code Style & Conventions
+
+- Language & TS config:
+  - TypeScript strict mode on; `moduleResolution: bundler`; path alias `@/* -> src/*` (tsconfig `paths`).
+  - App Router project structure (`src/app`), functional React components, client/server components as appropriate.
+- Linting:
+  - ESLint v9 flat config extends `next/core-web-vitals`, `next/typescript`, and `prettier`.
+  - Prettier plugin enforced as errors (`"prettier/prettier": "error"`). Run `npm run lint` and fix or `npm run lint:fix`.
+- Formatting (Prettier):
+  - `semi: true`, `trailingComma: "es5"`, `singleQuote: false`, `printWidth: 80`, `tabWidth: 2`, `arrowParens: "avoid"`.
+- UI & CSS:
+  - Tailwind CSS v4 via `@tailwindcss/postcss` in `postcss.config.mjs`.
+  - Global tokens in `src/styles/design-tokens.css` and CSS variables in `src/app/globals.css`.
+  - shadcn/radix primitives in `src/components/ui/*`. Prefer composable components and utility classes; keep components small and accessible.
+- Naming & structure:
+  - Components: `PascalCase.tsx` under feature directories (`post/`, `layout/`, `profile/`). Hooks in `src/hooks` as `useXxx.ts(x)`.
+  - Types in `src/types` (augmentations like `next-auth.d.ts`, domain types `post.ts`, `reaction.ts`, `profile.ts`).
+- Testing:
+  - Unit/integration: Jest 30 + Testing Library; `jest.setup.ts` loads `@testing-library/jest-dom` and `.env.local`.
+  - E2E: Playwright (`playwright.config.ts`) with webServer autostarting `npm run dev`.
+- API patterns:
+  - Next.js API handlers use `NextResponse` and forward to the Hono API. Prefer small, typed handlers that validate inputs and pass through errors.
+- Commit/PR (implicit):
+  - Keep diffs small, run format + lint + tests, and describe changes and any DB schema updates (Prisma migrations) in the PR description.
